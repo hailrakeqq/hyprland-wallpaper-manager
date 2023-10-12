@@ -1,3 +1,4 @@
+#include <iostream>
 #include <fstream>
 #include <sstream>
 #include <vector>
@@ -29,4 +30,12 @@ long getFileSize(std::string filePath){
     long fileSize = (long)file.tellg();
     file.close();
     return fileSize;
+}
+
+std::vector<image>::iterator getItemIndexInVector(std::vector<image> & vec, image *img){
+    for (auto i = vec.begin(); i != vec.end(); ++i) {
+        if (i->fullPath == img->fullPath) 
+            return i;
+    }
+    return vec.end();
 }

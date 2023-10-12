@@ -3,7 +3,8 @@
 
 #include <iostream>
 #include <vector>
-
+#include <filesystem>
+namespace fs = std::filesystem;
 typedef struct {
     std::string name;
     std::string fullPath;
@@ -16,15 +17,19 @@ class imageManager {
 public:
     imageManager(std::string imagesDirectoryPath);
     int getImagesCount();
-    void addImage(std::string imagePath);
+    bool isImageExist(std::string imagePath);
+    image *getImage(std::string imagePath);
+    void addImage(image* img);
     void addImages(std::string imagesDirectoryPath);
-    void deleteImage(std::string imageName);
-    void clearImages(std::vector<image> images);
-    image getRandomImage();
+    void deleteImage(image* img);
+    void clearImages(std::vector<image>* images);
+    image *getRandomImage();
 
 private:
     int imageCount;
     std::string imagesDirectoryPath;
     std::vector<image> images;
+
+    std::vector<image> getFilesInDirectory(std::string &directoryPath);
 };
 #endif // !IMAGEMANAGER_H

@@ -2,6 +2,7 @@
 #include <fstream>
 #include <sstream>
 #include <vector>
+#include <filesystem>
 
 std::vector<std::string> split (const std::string &s, char delim) {
     std::vector<std::string> result;
@@ -16,7 +17,8 @@ std::vector<std::string> split (const std::string &s, char delim) {
 }
 
 std::string getFileName(std::string filePath) {
-    return split(filePath, '/').back();
+    std::filesystem::path path(filePath);
+    return path.filename().string();
 }
 
 long getFileSize(std::string filePath){

@@ -2,15 +2,14 @@
 #include "../utils.cpp"
 
 void image::printFileDetails() {
-    std::cout << "Image name: " << image::name << std::endl;
-    std::cout << "Image path: " << image::fullPath << std::endl;
-    std::cout << "Image size: " << image::size << std::endl;
+    std::cout << "name: " << image::name << std::endl;
+    std::cout << "path: " << image::fullPath << std::endl;
+    std::cout << "size: " << image::size << std::endl;
 }
 
 imageManager::imageManager(std::string imagesDirectoryPath) {
     this->imagesDirectoryPath = imagesDirectoryPath;
     addImages(imagesDirectoryPath);
-    imageCount = images.size();
 }
 
 bool imageManager::isImageExist(std::string imagePath){
@@ -20,12 +19,19 @@ bool imageManager::isImageExist(std::string imagePath){
     }
     return false;
 }
+int imageManager::getImagesCount(){
+    return imageCount;
+}
+
+std::vector<image> imageManager::getImages(){
+    return images;
+}
 
 image* imageManager::getImage(std::string imagePath){
     if (!fs::is_regular_file(imagePath))
         return nullptr;
     
-    image *img = (image *)malloc(sizeof(image));
+    image *img = new image();
     img->fullPath = imagePath;
     img->name = getFileName(imagePath);
     img->size = getFileSize(imagePath);
@@ -34,7 +40,7 @@ image* imageManager::getImage(std::string imagePath){
 }
 
 void imageManager::addImage(image* img) {
-    if(isImageExist(img->fullPath)){
+    if(!isImageExist(img->fullPath)){
         images.push_back(*img);
         imageCount++;
     }
@@ -44,8 +50,8 @@ std::vector<image> imageManager::getFilesInDirectory(std::string& directoryPath)
     std::vector<image> images;
     for (const auto &entry : fs::directory_iterator(directoryPath)) {
         if (fs::is_regular_file(entry)) {
-            image *img = (image *)malloc(sizeof(image));
-            img->fullPath = entry.path();
+            image* img = new image();
+            img->fullPath = entry.path().string();
             img->name = entry.path().filename();
             img->size = entry.file_size();
 
@@ -76,6 +82,7 @@ void imageManager::addImages(std::string imagesDirectoryPath) {
 void imageManager::deleteImage(image* img) {
     if(!isImageExist(img->fullPath)){
         std::cerr << "File doesn't exist." << std::endl;
+        return;
     }
 
     for(auto image : images){
@@ -87,8 +94,16 @@ void imageManager::deleteImage(image* img) {
     }
 }
 
-void imageManager::clearImages(std::vector<image>* images) {
-    images->clear();
+void imageManager::deleteImage(int index){
+    if(index <= images.size() - 1){
+        images.erase(images.begin() + index);
+        imageCount--;
+    }
+}
+
+void imageManager::clearImages() {
+    images.clear();
+    imageCount = images.size();
 }
 
 image* imageManager::getRandomImage() {

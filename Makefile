@@ -7,6 +7,7 @@ CORE_SRC = $(CORE_DIR)/imageManager.cpp $(CORE_DIR)/settings.cpp $(CORE_DIR)/wal
 all:
 	mkdir -p $(BUILD_DIR)
 	$(CC) -o $(BUILD_DIR)/$(OUTPUT_BIN) $(SRC) $(CORE_SRC)
-
+debug:
+	$(CC) -g -o $(BUILD_DIR)/$(OUTPUT_BIN) $(SRC) $(CORE_SRC)
 clear:
 	rm -rf build

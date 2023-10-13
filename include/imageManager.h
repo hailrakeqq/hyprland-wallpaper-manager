@@ -22,7 +22,7 @@ public:
     std::vector<image> getImages();
     bool isImageExist(std::string imagePath);
     image *getImage(std::string imagePath);
-    void addImage(image* img);
+    void addImage(image *img);
     void addImages(std::string imagesDirectoryPath);
     void deleteImage(image* img);
     void deleteImage(int index);

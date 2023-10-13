@@ -1,5 +1,5 @@
 #include "../../include/imageManager.h"
-#include "../utils.cpp"
+#include "../../include/utils.h"
 
 void image::printFileDetails() {
     std::cout << "name: " << image::name << std::endl;

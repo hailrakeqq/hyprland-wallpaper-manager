@@ -1,20 +1,4 @@
-#include <iostream>
-#include <fstream>
-#include <sstream>
-#include <vector>
-#include <filesystem>
-
-std::vector<std::string> split (const std::string &s, char delim) {
-    std::vector<std::string> result;
-    std::stringstream ss (s);
-    std::string item;
-
-    while (getline (ss, item, delim)) {
-        result.push_back (item);
-    }
-
-    return result;
-}
+#include "../include/utils.h"
 
 std::string getFileName(std::string filePath) {
     std::filesystem::path path(filePath);

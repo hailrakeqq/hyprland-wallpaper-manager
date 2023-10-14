@@ -1,10 +1,16 @@
 #include <iostream>
 #include "../include/imageManager.h"
 #include "../include/wallpaperChanger.h"
-
-imageManager im = imageManager("/home/hailrake/media/Download/pics");
+#include "../include/configurator.h"
 
 int main(){
-    std::cout << "test" << std::endl;
+    auto config = configurator("config.json");
+    auto im = imageManager(&config);
+    auto images = im.getImages();
+    for (int i = 0; i < images.size(); i++){
+        images[i].printFileDetails();
+    }
+    std::cout << im.getImagesCount() << std::endl;
+
     return 0;
 }

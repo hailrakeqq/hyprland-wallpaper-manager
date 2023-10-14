@@ -12,6 +12,20 @@ imageManager::imageManager(std::string imagesDirectoryPath) {
     addImages(imagesDirectoryPath);
 }
 
+imageManager::imageManager(configurator*conf){
+    auto config = conf->getConfig();
+
+    for (auto jsonImage : config["images"]) {
+        image img;
+        img.fullPath = jsonImage["fullPath"];
+        img.name = jsonImage["name"];
+        img.size = jsonImage["size"];
+
+        images.push_back(img);
+    }
+    imageCount = images.size();
+}
+
 bool imageManager::isImageExist(std::string imagePath){
     for(auto image : images){
         if(image.fullPath == imagePath)

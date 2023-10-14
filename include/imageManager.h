@@ -4,20 +4,16 @@
 #include <iostream>
 #include <vector>
 #include <filesystem>
+#include "configurator.h"
+#include "image.h"
 
 namespace fs = std::filesystem;
-
-typedef struct {
-    std::string name;
-    std::string fullPath;
-    long size;
-
-    void printFileDetails();
-} image;
 
 class imageManager {
 public:
     imageManager(std::string imagesDirectoryPath);
+    imageManager(configurator*conf);
+
     int getImagesCount();
     std::vector<image> getImages();
     bool isImageExist(std::string imagePath);

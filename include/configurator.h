@@ -2,17 +2,28 @@
 #define CONFIGURATOR_H
 
 #include <string>
+#include <iostream>
 #include <fstream>
-//TODO: add json lib
+#include <nlohmann/json.hpp>
+#include <filesystem>
+#include "image.h"
 
-#include "../include/imageManager.h"
+using json = nlohmann::json;
+namespace fs = std::filesystem;
 
 class configurator {
 public:
-    void initializeConfig(std::string &configFilePath);
-    imageManager *initializeImageManager(std::string &configFilePath);
+    configurator(std::string configFilePath);
+    std::vector<image> getImagesFromConfig();
+    void addImageToConfig(image *img);
+    void removeImageFromConfig(image *img);
+    json getConfig();
+    void saveConfig();
 
 private:
+    bool isImageExistInConfig(image *img);
     std::string configPath;
+    json config;
 };
+
 #endif // CONFIGURATOR_H

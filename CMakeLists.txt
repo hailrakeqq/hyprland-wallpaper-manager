@@ -4,8 +4,8 @@ project(kde-wallpaper-scheduler)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(nlohmann_json 3.11.2 REQUIRED)
-
+add_subdirectory(json)
+include_directories(${CMAKE_SOURCE_DIR}/json)
 set(SRC
     src/main.cpp
     src/cmdUI.cpp
@@ -20,4 +20,4 @@ set(CORE_SRC
 )
 
 add_executable(kde-wallpaper-scheduler ${SRC} ${CORE_SRC})
-target_link_libraries(kde-wallpaper-scheduler nlohmann_json::nlohmann_json)
+target_link_libraries(kde-wallpaper-scheduler PRIVATE nlohmann_json::nlohmann_json)

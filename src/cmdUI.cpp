@@ -1,23 +1,24 @@
-#include <iostream>
-#include <vector>
-#include "../include/imageManager.h"
-#include "../include/wallpaperChanger.h"
+#include "../include/cmdUI.h"
 
 //TODO: дописати ось цю менюшку
 
-void showImages(std::vector<image> images)
-{
-    for (int i = 0; i < images.size(); i++){
-        std::cout << '[' << i << ']' << " " << images[i].name << std::endl;
-    }
+cmdUI::cmdUI(imageManager& im) : im(im){
+    this->im = im;
 }
 
-void changeImage(imageManager* im){
+void cmdUI::showImages()
+{
+    auto images = im.getImages();
+    for (int i = 0; i < images.size(); i++)
+        std::cout << '[' << i << ']' << " " << images[i].name << std::endl;
+}
+
+void cmdUI::changeImage(){
     std::cout << "Enter image index: ";
     int choice;
     std::cin >> choice;
-    if(choice < im->getImagesCount()){
-        auto images = im->getImages();
+    if(choice < im.getImagesCount()){
+        auto images = im.getImages();
         auto result = wallpaperChanger::setWallpaper(&images[choice]);
 
         if(result){
@@ -30,7 +31,7 @@ void changeImage(imageManager* im){
     std::cerr << "Index that you enter was outside of range." << std::endl;
 }
 
-void menu(imageManager* im){
+void cmdUI::renderMenu(){
     int choice;
     do {
         std::cout << "Test menu:" << std::endl;
@@ -41,16 +42,15 @@ void menu(imageManager* im){
         std::cout << "Choose option (1/2/3/4): ";
         
         std::cin >> choice;
-
         std::cin.clear();
         std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
         switch (choice) {
             case 1:
-                showImages(im->getImages());
+                showImages();
                 break;
             case 2:
-                changeImage(im);
+                changeImage();
                 break;
             case 3:
                 std::cout << "Settings" << std::endl;

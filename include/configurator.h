@@ -17,6 +17,7 @@ public:
     std::vector<image> getImagesFromConfig();
     void addImageToConfig(image *img);
     void removeImageFromConfig(image *img);
+    void updateScheduler(json &scheduler);
     json getConfig();
     void saveConfig();
 

@@ -13,16 +13,7 @@ imageManager::imageManager(std::string imagesDirectoryPath) {
 }
 
 imageManager::imageManager(configurator* conf){
-    auto config = conf->getConfig();
-
-    for (auto jsonImage : config["images"]) {
-        image img;
-        img.fullPath = jsonImage["fullPath"];
-        img.name = jsonImage["name"];
-        img.size = jsonImage["size"];
-
-        images.push_back(img);
-    }
+    images = conf->getImagesFromConfig();
     imageCount = images.size();
 }
 
@@ -48,8 +39,8 @@ image* imageManager::getImage(std::string imagePath){
     
     image *img = new image();
     img->fullPath = imagePath;
-    img->name = getFileName(imagePath);
-    img->size = getFileSize(imagePath);
+    img->name = utils::getFileName(imagePath);
+    img->size = utils::getFileSize(imagePath);
 
     return img;
 }
@@ -102,7 +93,7 @@ void imageManager::deleteImage(image* img) {
 
     for(auto image : images){
         if(image.fullPath == img->fullPath){
-            images.erase(getItemIndexInVector(images, img));
+            images.erase(utils::getItemIndexInVector(images, img));
             imageCount--;
             return;
         }

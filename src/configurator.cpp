@@ -10,6 +10,29 @@ configurator::configurator(std::string configFilePath){
     }
 
     config["images"] = json::array();
+    config["scheduler"] = json::object();
+    saveConfig();
+}
+
+std::vector<image> configurator::getImagesFromConfig()
+{
+    std::vector<image> images;
+   
+    for (auto jsonImage : configurator::config["images"])
+    {
+        image img;
+        img.fullPath = jsonImage["fullPath"];
+        img.name = jsonImage["name"];
+        img.size = jsonImage["size"];
+
+        images.push_back(img);
+    }
+
+    return images;
+}
+
+void configurator::updateScheduler(json &scheduler){
+    config["scheduler"] = scheduler;
     saveConfig();
 }
 

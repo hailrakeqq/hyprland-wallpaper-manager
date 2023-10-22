@@ -12,7 +12,7 @@ namespace fs = std::filesystem;
 class imageManager {
 public:
     imageManager(std::string imagesDirectoryPath);
-    imageManager(configurator*conf);
+    imageManager(configurator *conf);
 
     int getImagesCount();
     std::vector<image> getImages();

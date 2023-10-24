@@ -11,6 +11,8 @@ namespace fs = std::filesystem;
 
 class imageManager {
 public:
+    std::string monitors;
+    
     imageManager(std::string imagesDirectoryPath);
     imageManager(configurator *conf);
 
@@ -26,6 +28,7 @@ public:
     image *getRandomImage();
 
 private:
+    configurator *conf;
     int imageCount;
     std::string imagesDirectoryPath;
     std::vector<image> images;

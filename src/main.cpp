@@ -5,25 +5,19 @@
 
 int main()
 {
-    // auto config = configurator("config.json");
-    // auto im = imageManager(&config);
+    //TODO:написати тест до scheduler
 
-    // auto sched = new scheduler("2.0", &config, &im);
+    auto config = configurator("config.json");
+    auto im = imageManager(&config);
 
-    // auto images = im.getImages();
-
-    // for (auto image : images){
-    //     sched->addImageToPlaylist(&image);
-    //     config.addImageToConfig(&image);
-    // }
+    auto sched = new scheduler(&config, &im);
 
     // json schedulerJson = sched->toJson();
     // std::cout << schedulerJson.dump(4) << std::endl;
     
     // config.updateScheduler(schedulerJson);
 
-    // auto menu = cmdUI(im);
-    // menu.renderMenu();
-
+    auto menu = cmdUI(im, *sched);
+    menu.renderMenu();
     return 0;
 }

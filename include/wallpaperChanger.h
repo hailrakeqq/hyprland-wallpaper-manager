@@ -4,6 +4,6 @@
 
 class wallpaperChanger{
 public:
-    static bool setWallpaper(image *img);
+    static bool setWallpaper(std::string monitors, image *img);
 };
 #endif // !WALLPAPERCHANGER_H

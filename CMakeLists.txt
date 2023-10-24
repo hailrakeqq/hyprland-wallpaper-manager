@@ -1,8 +1,12 @@
 cmake_minimum_required(VERSION 3.10)
-project(kde-wallpaper-scheduler)
+project(hyprland-wallpaper-scheduler)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+#Set Debug - for debug
+#Set Release - for release
+set(CMAKE_BUILD_TYPE Debug)
 
 add_subdirectory(json)
 include_directories(${CMAKE_SOURCE_DIR}/json)
@@ -19,5 +23,5 @@ set(CORE_SRC
     src/core/scheduler.cpp
 )
 
-add_executable(kde-wallpaper-scheduler ${SRC} ${CORE_SRC})
-target_link_libraries(kde-wallpaper-scheduler PRIVATE nlohmann_json::nlohmann_json)
+add_executable(hyprland-wallpaper-scheduler ${SRC} ${CORE_SRC})
+target_link_libraries(hyprland-wallpaper-scheduler PRIVATE nlohmann_json::nlohmann_json)

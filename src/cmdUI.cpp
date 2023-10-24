@@ -2,8 +2,9 @@
 
 //TODO: дописати ось цю менюшку
 
-cmdUI::cmdUI(imageManager& im) : im(im){
+cmdUI::cmdUI(imageManager& im, scheduler &s) : im(im), s(s){
     this->im = im;
+    this->s = s;
 }
 
 void cmdUI::showImages()
@@ -15,11 +16,11 @@ void cmdUI::showImages()
 
 void cmdUI::changeImage(){
     std::cout << "Enter image index: ";
-    int choice;
-    std::cin >> choice;
-    if(choice < im.getImagesCount()){
+    int index;
+    std::cin >> index;
+    if(index < im.getImagesCount()){
         auto images = im.getImages();
-        auto result = wallpaperChanger::setWallpaper(&images[choice]);
+        auto result = wallpaperChanger::setWallpaper(im.monitors, &images[index]);
 
         if(result){
             std::cout << "Wallpaper successfully changed." << std::endl;
@@ -31,15 +32,85 @@ void cmdUI::changeImage(){
     std::cerr << "Index that you enter was outside of range." << std::endl;
 }
 
+void cmdUI::setRandom(){
+    auto img = im.getRandomImage();
+    if(s.getCurrentImage()->fullPath != img->fullPath){
+        wallpaperChanger::setWallpaper(im.monitors, img);
+        s.setCurrentImage(img);
+    }
+}
+
+void cmdUI::addImages(){
+    std::cout << "Enter path to wallpaper directory: ";
+    std::string path;
+    getline(std::cin, path);
+    
+    im.addImages(path);
+}
+
+void cmdUI::showPlaylist(){
+    for(auto image : s.getPlaylist())
+        image.printFileDetails();
+}
+
+void cmdUI::changeInterval(){
+    std::cout << "Enter new interval(example: \"2.30\" - 2 hour 30 minutes.): " << std::endl;
+    std::string newInterval;
+    std::cin >> newInterval;
+    s.changeInterval(newInterval);
+}
+
+void cmdUI::schedulerMenu(){
+    int choice;
+    do {
+        std::cout << "Scheduler Menu:" << std::endl;
+        std::cout << "1. start" << std::endl;
+        std::cout << "2. stop" << std::endl;
+        std::cout << "3. show playlist" << std::endl;        
+        std::cout << "4. settings" << std::endl;
+        std::cout << "5. Exit" << std::endl;
+        std::cout << "Choose option (1/2/3/4/5): ";
+        
+        std::cin >> choice;
+        std::cin.clear();
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
+        switch (choice)
+        {
+        case 1:
+            s.start();
+            break;
+        case 2:
+            s.stop();
+            break;
+        case 3:
+            showPlaylist();
+            break;
+        case 4:
+            changeInterval();
+            break;
+        case 5:
+            std::cout << "Exit..." << std::endl;
+            break;
+        default:
+            std::cout << "Incorrect choose." << std::endl;
+            break;
+        }
+    } while (choice != 5);
+}
+
 void cmdUI::renderMenu(){
     int choice;
     do {
-        std::cout << "Test menu:" << std::endl;
+        std::cout << "Menu:" << std::endl;
         std::cout << "1. show images" << std::endl;
-        std::cout << "2. set wallpaper" << std::endl;
-        std::cout << "3. settings" << std::endl;
-        std::cout << "4. Exit" << std::endl;
-        std::cout << "Choose option (1/2/3/4): ";
+        std::cout << "2. add image directory" << std::endl;
+        std::cout << "3. set random wallpaper" << std::endl;
+        std::cout << "4. set wallpaper" << std::endl;
+        std::cout << "5. scheduler" << std::endl;        
+        std::cout << "6. settings" << std::endl;
+        std::cout << "7. Exit" << std::endl;
+        std::cout << "Choose option: ";
         
         std::cin >> choice;
         std::cin.clear();
@@ -50,17 +121,26 @@ void cmdUI::renderMenu(){
                 showImages();
                 break;
             case 2:
-                changeImage();
+                addImages();
                 break;
             case 3:
-                std::cout << "Settings" << std::endl;
+                setRandom();
                 break;
             case 4:
+                changeImage();
+                break;
+            case 5:
+                schedulerMenu();
+                break;
+            case 6:
+                std::cout << "Settings" << std::endl;
+                break;
+            case 7:
                 std::cout << "Exit." << std::endl;
                 break;
             default:
                 std::cout << "Incorrect choose." << std::endl;
                 break;
         }
-    } while (choice != 4);
+    } while (choice != 7);
 }

@@ -2,17 +2,17 @@
 
 scheduler::scheduler(configurator *conf, imageManager *im){
     auto config = conf->getConfig();
-    json jsonData;
     std::ifstream jsonFile("config.json");
     if(!jsonFile.is_open()){
         std::cerr << "Failed to open config file." << std::endl;
         return;
     }
 
+    json jsonData;
     jsonFile >> jsonData;
     jsonFile.close();
 
-    if(jsonData.contains("scheduler")){
+    if(jsonData.contains("scheduler") && !jsonData["scheduler"].empty()){
         json scheduler = jsonData["scheduler"];
         json playlist = scheduler["playlist"];
         isRandomImage = scheduler["isRandomImage"];
@@ -68,6 +68,13 @@ json scheduler::toJson(){
     return jsonObject;
 }
 
+image *scheduler::getCurrentImage(){
+    return currentImage;
+}
+
+void scheduler::setCurrentImage(image* img){
+    currentImage = img;
+}
 
 void scheduler::addImageToPlaylist(image *img){
     playlist.push_back(*img);
@@ -127,7 +134,9 @@ void scheduler::scheduleImage(){
         imageToSet = &playlist[currentImageIndex];
         currentImageIndex++;
     }
-    wallpaperChanger::setWallpaper(imageToSet);
+    
+    auto monitors = conf->getMonitors();
+    wallpaperChanger::setWallpaper(monitors,imageToSet);
     currentImage = imageToSet;
 }
 
@@ -142,4 +151,8 @@ void scheduler::changeInterval(std::string interval){
     auto jsonSchedler = this->toJson();
     conf->updateScheduler(jsonSchedler);
     conf->saveConfig();
+}
+
+std::vector<image> scheduler::getPlaylist(){
+    return playlist;
 }

@@ -8,6 +8,15 @@ configurator::configurator(std::string configFilePath){
         fileStream.close();
         return;
     }
+    
+    std::cout << "Enter monitor(s) on which you want set wallpaper(example \"DP-1, DP-2\"): ";
+    std::string monitorInput;
+    std::getline(std::cin, monitorInput);
+
+    if (!monitorInput.empty()) 
+        config["monitors"] = monitorInput;
+    else 
+        std::cout << "Input is empty. Please provide a valid input." << std::endl;
 
     config["images"] = json::array();
     config["scheduler"] = json::object();
@@ -69,6 +78,11 @@ void configurator::removeImageFromConfig(image *img){
 
 json configurator::getConfig(){
     return config;
+}
+
+std::string configurator::getMonitors(){
+    auto result = config["monitors"];
+    return result;
 }
 
 bool configurator::isImageExistInConfig(image *img){

@@ -13,6 +13,8 @@ imageManager::imageManager(std::string imagesDirectoryPath) {
 }
 
 imageManager::imageManager(configurator* conf){
+    this->conf = conf;
+    monitors = conf->getMonitors();
     images = conf->getImagesFromConfig();
     imageCount = images.size();
 }
@@ -80,6 +82,7 @@ void imageManager::addImages(std::string imagesDirectoryPath) {
     }
 
     for(auto image : images){
+        conf->addImageToConfig(&image);
         imageManager::images.push_back(image);
         imageCount++;
     }

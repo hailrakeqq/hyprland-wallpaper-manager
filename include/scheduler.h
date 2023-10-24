@@ -22,10 +22,15 @@ public:
     void removeImageFromPlaylist(image *img);
     void removeImageFromPlaylist(uint index);
 
+    image *getCurrentImage();
+    void setCurrentImage(image* img);
+
     void start();
     void scheduleImage();
     void stop();
     void changeInterval(std::string interval);
+    
+    std::vector<image> getPlaylist();
 
 private:
     configurator *conf;

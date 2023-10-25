@@ -29,6 +29,7 @@ scheduler::scheduler(configurator *conf, imageManager *im){
         }
     }
 
+    currentImage = nullptr;
     currentImageIndex = 0;
     this->im = im;
     this->conf = conf;
@@ -42,6 +43,7 @@ scheduler::scheduler(std::string interval, configurator *conf, imageManager *im)
     else
         this->interval = intervalInMinutes;
 
+    currentImage = nullptr;
     currentImageIndex = 0;
     this->im = im;
     isSchedulerRun = false;

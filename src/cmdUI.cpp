@@ -33,11 +33,19 @@ void cmdUI::changeImage(){
 }
 
 void cmdUI::setRandom(){
-    auto img = im.getRandomImage();
-    if(s.getCurrentImage()->fullPath != img->fullPath){
-        wallpaperChanger::setWallpaper(im.monitors, img);
-        s.setCurrentImage(img);
+    image *imageToSet = im.getRandomImage();
+    image *currentImg = s.getCurrentImage();
+    
+    if (currentImg != nullptr) {
+        checkIsCurrentImageNotEqualRandomImage:
+        if(currentImg->fullPath == imageToSet->fullPath){
+            imageToSet = im.getRandomImage();
+            goto checkIsCurrentImageNotEqualRandomImage;
+        }
     }
+
+    wallpaperChanger::setWallpaper(im.monitors, imageToSet);
+    s.setCurrentImage(imageToSet);
 }
 
 void cmdUI::addImages(){

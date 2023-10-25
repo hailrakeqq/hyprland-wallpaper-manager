@@ -35,12 +35,18 @@ namespace utils
         return fileSize;
     }
 
-    image *getRandomImage(std::vector<image> &images){
-        int randomIndex = rand() % images.size();
+    image getRandomItem(const std::vector<image> &arr)
+    {
+        if (arr.empty()) 
+            throw std::invalid_argument("The array is empty");
+        
 
-        auto randomImage = images[randomIndex];
+        std::random_device rd;
+        std::mt19937 gen(rd());
+        std::uniform_int_distribution<size_t> distribution(0, arr.size() - 1);
 
-        return &randomImage;
+        size_t randomIndex = distribution(gen);
+        return arr[randomIndex];
     }
 
     std::vector<image>::iterator getItemIndexInVector(std::vector<image> & vec, image *img){

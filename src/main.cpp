@@ -17,7 +17,7 @@ int main()
     
     // config.updateScheduler(schedulerJson);
 
-    auto menu = cmdUI(im, *sched);
+    auto menu = cmdUI(im, *sched, config);
     menu.renderMenu();
     return 0;
 }

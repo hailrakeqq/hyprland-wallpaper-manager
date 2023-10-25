@@ -21,8 +21,9 @@ public:
     void addImageToPlaylist(image *img);
     void removeImageFromPlaylist(image *img);
     void removeImageFromPlaylist(uint index);
-
-    image *getCurrentImage();
+    int playlistSize();
+    
+    image getCurrentImage();
     void setCurrentImage(image* img);
 
     void start();
@@ -38,7 +39,7 @@ private:
     bool isSchedulerRun;
     bool isRandomImage;
     std::vector<image> playlist;
-    image *currentImage;
+    image currentImage;
     uint currentImageIndex;
     int interval;
 };

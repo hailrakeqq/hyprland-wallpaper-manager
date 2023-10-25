@@ -22,17 +22,18 @@ public:
     image *getImage(std::string imagePath);
     void addImage(image *img);
     void addImages(std::string imagesDirectoryPath);
-    void deleteImage(image* img);
+    std::vector<image> getImages(std::string imagesDirectoryPath);
+    void deleteImage(image *img);
     void deleteImage(int index);
     void clearImages();
-    image *getRandomImage();
 
 private:
     configurator *conf;
     int imageCount;
     std::string imagesDirectoryPath;
     std::vector<image> images;
-
+    bool isValidImagesDirectory(std::string pathToDirectory);
+    
     std::vector<image> getFilesInDirectory(std::string &directoryPath);
 };
 #endif // !IMAGEMANAGER_H

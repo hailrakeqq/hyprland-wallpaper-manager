@@ -1,10 +1,9 @@
 #include "../include/cmdUI.h"
 
-//TODO: дописати ось цю менюшку
-
-cmdUI::cmdUI(imageManager& im, scheduler &s) : im(im), s(s){
+cmdUI::cmdUI(imageManager& im, scheduler &s, configurator& conf) : im(im), s(s), conf(conf){
     this->im = im;
     this->s = s;
+    this->conf = conf;
 }
 
 void cmdUI::showImages()
@@ -33,27 +32,94 @@ void cmdUI::changeImage(){
 }
 
 void cmdUI::setRandom(){
-    image *imageToSet = im.getRandomImage();
-    image *currentImg = s.getCurrentImage();
-    
-    if (currentImg != nullptr) {
-        checkIsCurrentImageNotEqualRandomImage:
-        if(currentImg->fullPath == imageToSet->fullPath){
-            imageToSet = im.getRandomImage();
-            goto checkIsCurrentImageNotEqualRandomImage;
-        }
-    }
+    std::vector<image> images = im.getImages();
+    image currentImg = s.getCurrentImage();
 
-    wallpaperChanger::setWallpaper(im.monitors, imageToSet);
-    s.setCurrentImage(imageToSet);
+    checkIsCurrentImageNotEqualRandomImage:
+    image imageToSet = utils::getRandomItem(images);
+   
+    if(currentImg.fullPath == imageToSet.fullPath){
+        goto checkIsCurrentImageNotEqualRandomImage;
+    }
+    
+
+    wallpaperChanger::setWallpaper(im.monitors, &imageToSet);
+    s.setCurrentImage(&imageToSet);
 }
 
-void cmdUI::addImages(){
+void cmdUI::addImagesToImageManager(){
     std::cout << "Enter path to wallpaper directory: ";
     std::string path;
     getline(std::cin, path);
     
     im.addImages(path);
+}
+
+void cmdUI::addImageToPlaylist(){
+    std::string imagePath;
+    getline(std::cin, imagePath);
+
+    if(!imagePath.empty()){
+        auto img = im.getImage(imagePath);
+        s.addImageToPlaylist(img);
+    }
+}
+
+void cmdUI::addImagesToPlaylist(){
+    std::cout << "Enter path to directory: " << std::endl;
+    std::string imagesDirectoryPath;
+    getline(std::cin, imagesDirectoryPath);
+
+    if(!imagesDirectoryPath.empty()){
+        auto images = im.getImages(imagesDirectoryPath);
+        for(auto image: images)
+            s.addImageToPlaylist(&image);
+    }
+}
+
+void cmdUI::removeImageFromPlaylist(){
+    uint index;
+    std::cout << "Enter image index to delete: " << std::endl;
+    std::cin >> index;
+
+    if(index > s.playlistSize()){
+        std::cout << "Index is greater than count images in playlist" << std::endl;
+        return;
+    }
+
+    s.removeImageFromPlaylist(index);
+}
+
+void cmdUI::playlistSettings(){
+    uint8_t option;
+    do {
+        std::cout << "Playlist settings:" << std::endl;
+        std::cout << "1. Add image to playlist" << std::endl;
+        std::cout << "2. Add images directory to playlist" << std::endl;
+        std::cout << "3. Remove Image from playlist" << std::endl;
+        std::cout << "4. Back" << std::endl;
+        std::cout << "Choose option: ";
+
+        std::cin >> option;
+        static_cast<uint8_t>(option);
+        switch (option)
+        {
+            case 1:
+                addImageToPlaylist();
+                break;
+            case 2:
+                addImagesToPlaylist();
+                break;
+            case 3:
+                removeImageFromPlaylist();
+                break;
+            case 4:
+                break;
+            default:
+                std::cout << "Incorrect choose." << std::endl;
+                break;
+        }
+    } while (option != 4);
 }
 
 void cmdUI::showPlaylist(){
@@ -68,6 +134,16 @@ void cmdUI::changeInterval(){
     s.changeInterval(newInterval);
 }
 
+void cmdUI::changeDisplay(){
+    std::cout << "Enter monitor(s) on which you want set wallpaper(example \"DP-1, DP-2\"): ";
+    std::string monitorInput;
+    std::getline(std::cin, monitorInput);
+    if(!monitorInput.empty()){
+        im.monitors = monitorInput;
+        conf.updateMonitors(monitorInput);
+    }
+}
+
 void cmdUI::schedulerMenu(){
     int choice;
     do {
@@ -75,9 +151,10 @@ void cmdUI::schedulerMenu(){
         std::cout << "1. start" << std::endl;
         std::cout << "2. stop" << std::endl;
         std::cout << "3. show playlist" << std::endl;        
-        std::cout << "4. settings" << std::endl;
-        std::cout << "5. Exit" << std::endl;
-        std::cout << "Choose option (1/2/3/4/5): ";
+        std::cout << "4. playlist settings" << std::endl;        
+        std::cout << "5. settings" << std::endl;
+        std::cout << "6. Exit" << std::endl;
+        std::cout << "Choose option: ";
         
         std::cin >> choice;
         std::cin.clear();
@@ -95,16 +172,19 @@ void cmdUI::schedulerMenu(){
             showPlaylist();
             break;
         case 4:
-            changeInterval();
+            playlistSettings();
             break;
         case 5:
+            changeInterval();
+            break;
+        case 6:
             std::cout << "Exit..." << std::endl;
             break;
         default:
             std::cout << "Incorrect choose." << std::endl;
             break;
         }
-    } while (choice != 5);
+    } while (choice != 6);
 }
 
 void cmdUI::renderMenu(){
@@ -129,7 +209,7 @@ void cmdUI::renderMenu(){
                 showImages();
                 break;
             case 2:
-                addImages();
+                addImagesToImageManager();
                 break;
             case 3:
                 setRandom();
@@ -141,7 +221,7 @@ void cmdUI::renderMenu(){
                 schedulerMenu();
                 break;
             case 6:
-                std::cout << "Settings" << std::endl;
+                changeDisplay();
                 break;
             case 7:
                 std::cout << "Exit." << std::endl;

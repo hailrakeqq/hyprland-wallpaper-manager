@@ -54,6 +54,7 @@ void imageManager::addImage(image* img) {
     }
 }
 
+//TODO: add check if it is image (.png .jpg etc...)
 std::vector<image> imageManager::getFilesInDirectory(std::string& directoryPath) {
     std::vector<image> images;
     for (const auto &entry : fs::directory_iterator(directoryPath)) {
@@ -69,23 +70,40 @@ std::vector<image> imageManager::getFilesInDirectory(std::string& directoryPath)
     return images;
 }
 
-void imageManager::addImages(std::string imagesDirectoryPath) {
-    if(!fs::is_directory(imagesDirectoryPath)){
-        std::cerr << imagesDirectoryPath << " is not directory" << std::endl;
-        return;
+bool imageManager::isValidImagesDirectory(std::string pathToDirectory){
+     if(!fs::is_directory(pathToDirectory)){
+        std::cerr << pathToDirectory << " is not directory" << std::endl;
+        return false;
     }
 
-    std::vector<image> images = getFilesInDirectory(imagesDirectoryPath);
+    std::vector<image> images = getFilesInDirectory(pathToDirectory);
     if(images.empty()){
-        std::cerr << imagesDirectoryPath << " directory is emtpy." << std::endl;
-        return;
+        std::cerr << pathToDirectory << " directory is emtpy." << std::endl;
+        return false;
     }
 
-    for(auto image : images){
-        conf->addImageToConfig(&image);
-        imageManager::images.push_back(image);
-        imageCount++;
+    return true;
+}
+
+void imageManager::addImages(std::string imagesDirectoryPath) {
+    if(isValidImagesDirectory(imagesDirectoryPath)){
+        auto images = getFilesInDirectory(imagesDirectoryPath);
+        for (auto image : images) {
+            conf->addImageToConfig(&image);
+            imageManager::images.push_back(image);
+            imageCount++;
+        }
+    } else {
+        std::cout << "Directory is not valid." << std::endl;
     }
+}
+
+
+std::vector<image> imageManager::getImages(std::string imagesDirectoryPath){
+    if(isValidImagesDirectory(imagesDirectoryPath))
+        return getFilesInDirectory(imagesDirectoryPath);
+    else 
+        std::cout << "Directory is not valid." << std::endl;
 }
 
 void imageManager::deleteImage(image* img) {
@@ -113,12 +131,4 @@ void imageManager::deleteImage(int index){
 void imageManager::clearImages() {
     images.clear();
     imageCount = images.size();
-}
-
-image* imageManager::getRandomImage() {
-    if(imageCount == 0){
-        return nullptr;
-    }
-    int randomIndex = rand() % imageCount;
-    return &images.at(randomIndex);
 }

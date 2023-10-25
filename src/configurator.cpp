@@ -23,6 +23,11 @@ configurator::configurator(std::string configFilePath){
     saveConfig();
 }
 
+void configurator::updateMonitors(std::string monitors){
+    config["monitors"] = monitors;
+    saveConfig();
+}
+
 std::vector<image> configurator::getImagesFromConfig()
 {
     std::vector<image> images;

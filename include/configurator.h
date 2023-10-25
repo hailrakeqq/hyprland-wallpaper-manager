@@ -18,6 +18,7 @@ public:
     void addImageToConfig(image *img);
     void removeImageFromConfig(image *img);
     void updateScheduler(json &scheduler);
+    void updateMonitors(std::string monitors);
     json getConfig();
     std::string getMonitors();
     void saveConfig();

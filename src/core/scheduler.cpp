@@ -29,7 +29,7 @@ scheduler::scheduler(configurator *conf, imageManager *im){
         }
     }
 
-    currentImage = nullptr;
+    // currentImage = NULL;
     currentImageIndex = 0;
     this->im = im;
     this->conf = conf;
@@ -43,7 +43,6 @@ scheduler::scheduler(std::string interval, configurator *conf, imageManager *im)
     else
         this->interval = intervalInMinutes;
 
-    currentImage = nullptr;
     currentImageIndex = 0;
     this->im = im;
     isSchedulerRun = false;
@@ -70,12 +69,12 @@ json scheduler::toJson(){
     return jsonObject;
 }
 
-image *scheduler::getCurrentImage(){
+image scheduler::getCurrentImage(){
     return currentImage;
 }
 
 void scheduler::setCurrentImage(image* img){
-    currentImage = img;
+    currentImage = *img;
 }
 
 void scheduler::addImageToPlaylist(image *img){
@@ -113,32 +112,34 @@ void scheduler::start(){
     }
 }
 
+int scheduler::playlistSize(){
+    return playlist.size();
+}
+
 void scheduler::scheduleImage(){
     if(playlist.empty()){
         std::cout << "Playlist is empty." << std::endl;
         return;
     }
 
-    image *imageToSet;
+    image imageToSet;
 
     if (isRandomImage == true){
-        image *imageToSet = utils::getRandomImage(playlist);
-        
+
         checkIsCurrentImageNotEqualRandomImage:
-        if(currentImage->fullPath == imageToSet->fullPath){
-            imageToSet = utils::getRandomImage(playlist);
+        imageToSet = utils::getRandomItem(playlist);
+        if(currentImage.fullPath == imageToSet.fullPath)
             goto checkIsCurrentImageNotEqualRandomImage;
-        }
     } else {
         if(currentImageIndex == playlist.size())
             currentImageIndex = 0;
 
-        imageToSet = &playlist[currentImageIndex];
+        imageToSet = playlist[currentImageIndex];
         currentImageIndex++;
     }
     
     auto monitors = conf->getMonitors();
-    wallpaperChanger::setWallpaper(monitors,imageToSet);
+    wallpaperChanger::setWallpaper(monitors, &imageToSet);
     currentImage = imageToSet;
 }
 

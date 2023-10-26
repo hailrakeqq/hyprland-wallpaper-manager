@@ -56,6 +56,7 @@ void cmdUI::addImagesToImageManager(){
 }
 
 void cmdUI::addImageToPlaylist(){
+    std::cout << "Enter path to image: ";
     std::string imagePath;
     getline(std::cin, imagePath);
 
@@ -78,7 +79,7 @@ void cmdUI::addImagesToPlaylist(){
 }
 
 void cmdUI::removeImageFromPlaylist(){
-    uint index;
+    int index;
     std::cout << "Enter image index to delete: " << std::endl;
     std::cin >> index;
 
@@ -91,7 +92,7 @@ void cmdUI::removeImageFromPlaylist(){
 }
 
 void cmdUI::playlistSettings(){
-    uint8_t option;
+    int option;
     do {
         std::cout << "Playlist settings:" << std::endl;
         std::cout << "1. Add image to playlist" << std::endl;
@@ -101,7 +102,9 @@ void cmdUI::playlistSettings(){
         std::cout << "Choose option: ";
 
         std::cin >> option;
-        static_cast<uint8_t>(option);
+        std::cin.clear();
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
         switch (option)
         {
             case 1:
@@ -150,10 +153,14 @@ void cmdUI::schedulerMenu(){
         std::cout << "Scheduler Menu:" << std::endl;
         std::cout << "1. start" << std::endl;
         std::cout << "2. stop" << std::endl;
-        std::cout << "3. show playlist" << std::endl;        
-        std::cout << "4. playlist settings" << std::endl;        
-        std::cout << "5. settings" << std::endl;
-        std::cout << "6. Exit" << std::endl;
+        std::cout << "3. show playlist" << std::endl;    
+        if(s.isRandomImage())
+            std::cout << "4. set playlist image?" << std::endl;
+        else 
+            std::cout << "4. set random image?" << std::endl;
+        std::cout << "5. playlist settings" << std::endl;        
+        std::cout << "6. settings" << std::endl;
+        std::cout << "7. Exit" << std::endl;
         std::cout << "Choose option: ";
         
         std::cin >> choice;
@@ -172,19 +179,22 @@ void cmdUI::schedulerMenu(){
             showPlaylist();
             break;
         case 4:
-            playlistSettings();
+            s.setRandomImage();
             break;
         case 5:
-            changeInterval();
+            playlistSettings();
             break;
         case 6:
+            changeInterval();
+            break;
+        case 7:
             std::cout << "Exit..." << std::endl;
             break;
         default:
             std::cout << "Incorrect choose." << std::endl;
             break;
         }
-    } while (choice != 6);
+    } while (choice != 7);
 }
 
 void cmdUI::renderMenu(){

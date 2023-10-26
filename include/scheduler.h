@@ -26,6 +26,9 @@ public:
     image getCurrentImage();
     void setCurrentImage(image* img);
 
+    bool isRandomImage();
+    void setRandomImage();
+
     void start();
     void scheduleImage();
     void stop();
@@ -37,7 +40,7 @@ private:
     configurator *conf;
     imageManager *im;
     bool isSchedulerRun;
-    bool isRandomImage;
+    bool randomImage;
     std::vector<image> playlist;
     image currentImage;
     uint currentImageIndex;

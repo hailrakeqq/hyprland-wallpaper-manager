@@ -15,7 +15,7 @@ scheduler::scheduler(configurator *conf, imageManager *im){
     if(jsonData.contains("scheduler") && !jsonData["scheduler"].empty()){
         json scheduler = jsonData["scheduler"];
         json playlist = scheduler["playlist"];
-        isRandomImage = scheduler["isRandomImage"];
+        randomImage = scheduler["isRandomImage"];
         this->interval = scheduler["interval"];
 
         for(auto item : playlist){
@@ -46,12 +46,12 @@ scheduler::scheduler(std::string interval, configurator *conf, imageManager *im)
     currentImageIndex = 0;
     this->im = im;
     isSchedulerRun = false;
-    isRandomImage = true;
+    randomImage = true;
 }
 
 json scheduler::toJson(){
     json jsonObject;
-    jsonObject["isRandomImage"] = isRandomImage;
+    jsonObject["isRandomImage"] = randomImage;
     jsonObject["interval"] = interval;
     json playlistArray;
 
@@ -79,12 +79,14 @@ void scheduler::setCurrentImage(image* img){
 
 void scheduler::addImageToPlaylist(image *img){
     playlist.push_back(*img);
+    conf->addImageToPlaylist(img);
 }
 
 void scheduler::removeImageFromPlaylist(image *img){
     for (uint i = 0; i < playlist.size(); i++){
         if(playlist[i].fullPath == img->fullPath){
             playlist.erase(playlist.begin() + i);
+            conf->removeImageFromPlaylist(img);
         }
     }
 }
@@ -117,20 +119,18 @@ int scheduler::playlistSize(){
 }
 
 void scheduler::scheduleImage(){
-    if(playlist.empty()){
-        std::cout << "Playlist is empty." << std::endl;
-        return;
-    }
-
     image imageToSet;
 
-    if (isRandomImage == true){
-
+    if (randomImage == true){
         checkIsCurrentImageNotEqualRandomImage:
-        imageToSet = utils::getRandomItem(playlist);
+        imageToSet = utils::getRandomItem(im->getImages());
         if(currentImage.fullPath == imageToSet.fullPath)
             goto checkIsCurrentImageNotEqualRandomImage;
     } else {
+        if(playlist.empty()){
+            std::cout << "Playlist is empty." << std::endl;
+            return;
+        }
         if(currentImageIndex == playlist.size())
             currentImageIndex = 0;
 
@@ -147,9 +147,17 @@ void scheduler::stop(){
     isSchedulerRun = false;
 }
 
+bool scheduler::isRandomImage(){
+    return randomImage;
+}
+
+void scheduler::setRandomImage(){
+    randomImage == true ? randomImage = false : randomImage = true;
+}
+
 void scheduler::changeInterval(std::string interval){
     int intervalInMinutes = utils::getImageIntervalTimeInMinutes(interval);
-    intervalInMinutes == -1 ? this->interval = 0 : this->interval == intervalInMinutes;
+    intervalInMinutes == -1 ? this->interval = 0 : this->interval = intervalInMinutes;
 
     auto jsonSchedler = this->toJson();
     conf->updateScheduler(jsonSchedler);

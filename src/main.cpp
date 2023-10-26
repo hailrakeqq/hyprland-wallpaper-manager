@@ -6,6 +6,7 @@
 int main()
 {
     //TODO:написати тест до scheduler
+    //протестити як воно працює
 
     auto config = configurator("config.json");
     auto im = imageManager(&config);

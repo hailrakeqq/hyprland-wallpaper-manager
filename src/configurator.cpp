@@ -50,20 +50,52 @@ void configurator::updateScheduler(json &scheduler){
     saveConfig();
 }
 
+json configurator::createJsonImage(image *img){
+    json imageJson;
+    imageJson["name"] = img->name;
+    imageJson["fullPath"] = img->fullPath;
+    imageJson["size"] = img->size;
+    return imageJson;
+}
+
 void configurator::addImageToConfig(image *img){
     if(isImageExistInConfig(img)){
         std::cout << "Image '" << img->fullPath << "' already exist in JSON." << std::endl;
         return;
     }
 
-    json imageJson;
-    imageJson["name"] = img->name;
-    imageJson["fullPath"] = img->fullPath;
-    imageJson["size"] = img->size;
-
+    json imageJson = createJsonImage(img);
     config["images"].push_back(imageJson);
     saveConfig();
 }
+
+void configurator::addImageToPlaylist(image *img){
+   if(isImageExistInConfig(img)){
+        std::cout << "Image '" << img->fullPath << "' already exist in JSON." << std::endl;
+        return;
+    }
+
+    json imageJson = createJsonImage(img);
+    config["scheduler"]["playlist"].push_back(imageJson);
+    saveConfig();
+}
+
+void configurator::removeImageFromPlaylist(image *img){
+    if(isImageExistInConfig(img)){
+        std::cout << "Image '" << img->fullPath << "' is not exist in the JSON." << std::endl;
+        return;
+    }
+
+    for (auto it = config["scheduler"]["playlist"].begin(); it != config["scheduler"]["playlist"].end(); ++it) {
+        if (it->at("fullPath") == img->fullPath) {
+            config["scheduler"]["playlist"].erase(it);
+            saveConfig();
+            return;
+        }
+    }
+    std::cout << "Key '" << img->fullPath << "' not found in the JSON." << std::endl;
+}
+
 
 void configurator::removeImageFromConfig(image *img){
     if(isImageExistInConfig(img)){

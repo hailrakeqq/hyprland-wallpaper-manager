@@ -16,6 +16,8 @@ public:
     configurator(std::string configFilePath);
     std::vector<image> getImagesFromConfig();
     void addImageToConfig(image *img);
+    void addImageToPlaylist(image *img);
+    void removeImageFromPlaylist(image *img);
     void removeImageFromConfig(image *img);
     void updateScheduler(json &scheduler);
     void updateMonitors(std::string monitors);
@@ -25,6 +27,7 @@ public:
 
 private:
     bool isImageExistInConfig(image *img);
+    json createJsonImage(image *img);
     std::string configPath;
     json config;
 };

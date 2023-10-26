@@ -58,63 +58,54 @@ json configurator::createJsonImage(image *img){
     return imageJson;
 }
 
-void configurator::addImageToConfig(image *img){
+void configurator::addImage(image *img, imageType type){
     if(isImageExistInConfig(img)){
         std::cout << "Image '" << img->fullPath << "' already exist in JSON." << std::endl;
         return;
     }
 
     json imageJson = createJsonImage(img);
-    config["images"].push_back(imageJson);
-    saveConfig();
-}
-
-void configurator::addImageToPlaylist(image *img){
-   if(isImageExistInConfig(img)){
-        std::cout << "Image '" << img->fullPath << "' already exist in JSON." << std::endl;
-        return;
+    // auto target = type == IMAGE_MANAGER ? config["images"] : config["scheduler"]["playlist"];
+    if(type == IMAGE_MANAGER){
+        config["images"].push_back(imageJson);
+    } else {
+        config["scheduler"]["playlist"].push_back(imageJson);
     }
-
-    json imageJson = createJsonImage(img);
-    config["scheduler"]["playlist"].push_back(imageJson);
     saveConfig();
 }
 
-void configurator::removeImageFromPlaylist(image *img){
+void configurator::removeImage(image *img, imageType type){
     if(isImageExistInConfig(img)){
         std::cout << "Image '" << img->fullPath << "' is not exist in the JSON." << std::endl;
         return;
     }
 
-    for (auto it = config["scheduler"]["playlist"].begin(); it != config["scheduler"]["playlist"].end(); ++it) {
+    auto& target = type == IMAGE_MANAGER ? config["images"] : config["scheduler"]["playlist"];
+
+    for (auto it = target.begin(); it != target.end(); ++it)
+    {
         if (it->at("fullPath") == img->fullPath) {
-            config["scheduler"]["playlist"].erase(it);
-            saveConfig();
+            target.erase(it);
             return;
         }
     }
+ 
     std::cout << "Key '" << img->fullPath << "' not found in the JSON." << std::endl;
 }
 
+void configurator::removeImage(uint index, imageType type){
+    auto& target = type == IMAGE_MANAGER ? config["images"] : config["scheduler"]["playlist"];
 
-void configurator::removeImageFromConfig(image *img){
-    if(isImageExistInConfig(img)){
-        std::cout << "Image '" << img->fullPath << "' is not exist in the JSON." << std::endl;
-        return;
-    }
-
-    for (auto it = config["images"].begin(); it != config["images"].end(); ++it) {
-        if (it->at("fullPath") == img->fullPath) {
-            config["images"].erase(it);
-            saveConfig();
-            return;
-        }
-    }
-    std::cout << "Key '" << img->fullPath << "' not found in the JSON." << std::endl;
+    target.erase(target.begin() + index);
 }
 
 json configurator::getConfig(){
     return config;
+}
+
+void configurator::setImageSchedulerType(bool type){
+    config["scheduler"]["isRandomImage"] = type;
+    saveConfig();
 }
 
 std::string configurator::getMonitors(){

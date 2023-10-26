@@ -11,11 +11,12 @@ class cmdUI {
 public:
     cmdUI(imageManager &im, scheduler &s, configurator &conf);
     void renderMenu();
-    void addImagesToImageManager();
     void showImages();
-    void playlistSettings();
-    void addImageToPlaylist();
+    void addImagesToImageManager();
     void addImagesToPlaylist();
+    void addImageToPlaylist();
+    void playlistSettings();
+    void removeImageFromImageManager();
     void removeImageFromPlaylist();
     void changeImage();
     void setRandom();

@@ -11,14 +11,21 @@
 using json = nlohmann::json;
 namespace fs = std::filesystem;
 
-class configurator {
+enum imageType
+{
+    IMAGE_MANAGER,
+    PLAYLIST
+};
+
+class configurator
+{
 public:
     configurator(std::string configFilePath);
     std::vector<image> getImagesFromConfig();
-    void addImageToConfig(image *img);
-    void addImageToPlaylist(image *img);
-    void removeImageFromPlaylist(image *img);
-    void removeImageFromConfig(image *img);
+    void addImage(image *img, imageType type);
+    void removeImage(image *img, imageType type);
+    void removeImage(uint index, imageType type);
+    void setImageSchedulerType(bool type);
     void updateScheduler(json &scheduler);
     void updateMonitors(std::string monitors);
     json getConfig();

@@ -34,6 +34,9 @@ scheduler::scheduler(configurator *conf, imageManager *im){
     this->im = im;
     this->conf = conf;
     isSchedulerRun = false;
+
+    auto schedulerJson = toJson();
+    conf->updateScheduler(schedulerJson);
 }
 
 scheduler::scheduler(std::string interval, configurator *conf, imageManager *im){
@@ -79,14 +82,14 @@ void scheduler::setCurrentImage(image* img){
 
 void scheduler::addImageToPlaylist(image *img){
     playlist.push_back(*img);
-    conf->addImageToPlaylist(img);
+    conf->addImage(img, PLAYLIST);
 }
 
 void scheduler::removeImageFromPlaylist(image *img){
     for (uint i = 0; i < playlist.size(); i++){
         if(playlist[i].fullPath == img->fullPath){
             playlist.erase(playlist.begin() + i);
-            conf->removeImageFromPlaylist(img);
+            conf->removeImage(img, PLAYLIST);
         }
     }
 }
@@ -98,6 +101,7 @@ void scheduler::removeImageFromPlaylist(uint index){
     }
 
     playlist.erase(playlist.begin() + index);
+    conf->removeImage(index, PLAYLIST);
 }
 
 void scheduler::start(){
@@ -153,6 +157,7 @@ bool scheduler::isRandomImage(){
 
 void scheduler::setRandomImage(){
     randomImage == true ? randomImage = false : randomImage = true;
+    conf->setImageSchedulerType(randomImage);
 }
 
 void scheduler::changeInterval(std::string interval){

@@ -89,7 +89,7 @@ void imageManager::addImages(std::string imagesDirectoryPath) {
     if(isValidImagesDirectory(imagesDirectoryPath)){
         auto images = getFilesInDirectory(imagesDirectoryPath);
         for (auto image : images) {
-            conf->addImageToConfig(&image);
+            conf->addImage(&image, IMAGE_MANAGER);
             imageManager::images.push_back(image);
             imageCount++;
         }
@@ -124,11 +124,15 @@ void imageManager::deleteImage(image* img) {
 void imageManager::deleteImage(int index){
     if(index <= images.size() - 1){
         images.erase(images.begin() + index);
+        conf->removeImage(index, IMAGE_MANAGER);
         imageCount--;
     }
 }
 
 void imageManager::clearImages() {
+    for(auto image : images)
+        conf->removeImage(&image, IMAGE_MANAGER);
+    
     images.clear();
     imageCount = images.size();
 }

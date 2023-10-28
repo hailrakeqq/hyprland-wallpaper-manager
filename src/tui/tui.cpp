@@ -1,19 +1,19 @@
-#include "../include/cmdUI.h"
+#include "../include/tui.h"
 
-cmdUI::cmdUI(imageManager& im, scheduler &s, configurator& conf) : im(im), s(s), conf(conf){
+tui::tui(imageManager& im, scheduler &s, configurator& conf) : im(im), s(s), conf(conf){
     this->im = im;
     this->s = s;
     this->conf = conf;
 }
 
-void cmdUI::showImages()
+void tui::showImages()
 {
     auto images = im.getImages();
     for (int i = 0; i < images.size(); i++)
         std::cout << '[' << i << ']' << " " << images[i].name << std::endl;
 }
 
-void cmdUI::changeImage(){
+void tui::changeImage(){
     std::cout << "Enter image index: ";
     int index;
     std::cin >> index;
@@ -31,7 +31,7 @@ void cmdUI::changeImage(){
     std::cerr << "Index that you enter was outside of range." << std::endl;
 }
 
-void cmdUI::setRandom(){
+void tui::setRandom(){
     std::vector<image> images = im.getImages();
     image currentImg = s.getCurrentImage();
 
@@ -47,7 +47,7 @@ void cmdUI::setRandom(){
     s.setCurrentImage(&imageToSet);
 }
 
-void cmdUI::addImagesToImageManager(){
+void tui::addImagesToImageManager(){
     std::cout << "Enter path to wallpaper directory: ";
     std::string path;
     getline(std::cin, path);
@@ -56,7 +56,7 @@ void cmdUI::addImagesToImageManager(){
     std::cout << "Image was successfully added to image manager" << std::endl;
 }
 
-void cmdUI::addImageToPlaylist(){
+void tui::addImageToPlaylist(){
     std::cout << "Enter path to image: ";
     std::string imagePath;
     getline(std::cin, imagePath);
@@ -68,7 +68,7 @@ void cmdUI::addImageToPlaylist(){
     }
 }
 
-void cmdUI::addImagesToPlaylist(){
+void tui::addImagesToPlaylist(){
     std::cout << "Enter path to directory: " << std::endl;
     std::string imagesDirectoryPath;
     getline(std::cin, imagesDirectoryPath);
@@ -82,7 +82,7 @@ void cmdUI::addImagesToPlaylist(){
     }
 }
 
-void cmdUI::removeImageFromPlaylist(){
+void tui::removeImageFromPlaylist(){
     int index;
     std::cout << "Enter image index to delete: ";
     std::cin >> index;
@@ -96,7 +96,7 @@ void cmdUI::removeImageFromPlaylist(){
     conf.saveConfig();
 }
 
-void cmdUI::removeImageFromImageManager(){
+void tui::removeImageFromImageManager(){
     std::cout << "Enter image index to delete: ";
     int index;
     std::cin >> index;
@@ -111,7 +111,7 @@ void cmdUI::removeImageFromImageManager(){
     std::cout << "Image was successfully deleted" << std::endl;
 }
 
-void cmdUI::playlistSettings(){
+void tui::playlistSettings(){
     int option;
     do {
         std::cout << "Playlist settings:" << std::endl;
@@ -143,19 +143,19 @@ void cmdUI::playlistSettings(){
     } while (option != 4);
 }
 
-void cmdUI::showPlaylist(){
+void tui::showPlaylist(){
     for(auto image : s.getPlaylist())
         image.printFileDetails();
 }
 
-void cmdUI::changeInterval(){
+void tui::changeInterval(){
     std::cout << "Enter new interval(example: \"2.30\" - 2 hour 30 minutes.): " << std::endl;
     std::string newInterval;
     std::cin >> newInterval;
     s.changeInterval(newInterval);
 }
 
-void cmdUI::changeDisplay(){
+void tui::changeDisplay(){
     std::cout << "Enter monitor(s) on which you want set wallpaper(example \"DP-1, DP-2\"): ";
     std::string monitorInput;
     std::getline(std::cin, monitorInput);
@@ -165,7 +165,7 @@ void cmdUI::changeDisplay(){
     }
 }
 
-void cmdUI::schedulerMenu(){
+void tui::schedulerMenu(){
     int choice;
     do {
         std::cout << "Scheduler Menu:" << std::endl;
@@ -215,7 +215,7 @@ void cmdUI::schedulerMenu(){
     } while (choice != 7);
 }
 
-void cmdUI::renderMenu(){
+void tui::renderMenu(){
     int choice;
     do {
         std::cout << "Menu:" << std::endl;

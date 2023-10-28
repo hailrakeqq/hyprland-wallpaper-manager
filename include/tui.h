@@ -1,5 +1,5 @@
-#ifndef CMDUI_H
-#define CMDUI_H
+#ifndef TUI_H
+#define TUI_H
 
 #include <iostream>
 #include <vector>
@@ -7,9 +7,9 @@
 #include "wallpaperChanger.h"
 #include "scheduler.h"
 
-class cmdUI {
+class tui {
 public:
-    cmdUI(imageManager &im, scheduler &s, configurator &conf);
+    tui(imageManager &im, scheduler &s, configurator &conf);
     void renderMenu();
     void showImages();
     void addImagesToImageManager();
@@ -31,4 +31,4 @@ private:
     configurator &conf;
 };
 
-#endif // !CMDUI_H
+#endif // !TUI_H

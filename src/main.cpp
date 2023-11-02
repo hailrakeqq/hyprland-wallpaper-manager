@@ -1,23 +1,23 @@
-#include <iostream>
 #include "../include/configurator.h"
 #include "../include/gui.h"
-#include "../include/tui.h"
 #include "../include/scheduler.h"
+#include "../include/tui.h"
+#include <iostream>
 
-int main(int argc, char** argv)
-{
-    auto config = configurator("config.json");
-    auto im = imageManager(&config);
+int main(int argc, char **argv) {
+  auto config = new configurator("config.json");
+  auto im = new imageManager(config);
 
-    auto sched = new scheduler(&config, &im);
+  auto sched = new scheduler(config, im);
 
 #ifdef COMPILE_GUI
-    auto guiMenu = gui();
-    guiMenu.test(argc, argv);
+  auto g = new gui(im, sched);
+  g->run(argc, argv);
+
 #else
-    auto tuiMenu = tui(im, *sched, config);
-    tuiMenu.renderMenu();
+  auto tuiMenu = tui(im, *sched, config);
+  tuiMenu.renderMenu();
 #endif
 
-    return 0;
+  return 0;
 }

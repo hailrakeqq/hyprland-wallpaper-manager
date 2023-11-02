@@ -28,7 +28,6 @@ set(SRC
 
 set(CORE_SRC
     src/core/imageManager.cpp
-    src/core/settings.cpp
     src/core/wallpaperChanger.cpp
     src/core/scheduler.cpp
     src/core/configurator.cpp
@@ -37,6 +36,7 @@ set(CORE_SRC
 if(COMPILE_GUI)
     set(GUI
         src/gui/gui.cpp
+        src/gui/mainWindow.cpp
     )
     add_definitions(-DCOMPILE_GUI)
     add_executable(hyprland-wallpaper-scheduler ${SRC} ${CORE_SRC} ${GUI})

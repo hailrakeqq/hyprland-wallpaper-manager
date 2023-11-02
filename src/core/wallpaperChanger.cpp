@@ -1,10 +1,12 @@
 #include "../../include/wallpaperChanger.h"
 
-bool wallpaperChanger::setWallpaper(std::string monitors, image* img) {
-    
-    std::string command = "hyprctl hyprpaper preload " + img->fullPath + " && hyprctl hyprpaper wallpaper " + monitors + "," + img->fullPath;
+bool wallpaperChanger::setWallpaper(std::string monitors, image *img) {
 
-    int result = std::system(command.c_str());
+  std::string command = "hyprctl hyprpaper preload " + img->fullPath +
+                        " && hyprctl hyprpaper wallpaper " + monitors + "," +
+                        img->fullPath;
 
-    return result == 0 ? true : false;  
+  int result = std::system(command.c_str());
+
+  return result == 0 ? true : false;
 }

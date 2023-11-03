@@ -80,20 +80,6 @@
                 <property name="receives-default">1</property>
               </object>
             </child>
-            <child>
-              <object class="GtkButton" id="test_add_btn">
-                <property name="label" translatable="1">add item(test)</property>
-                <property name="focusable">1</property>
-                <property name="receives-default">1</property>
-              </object>
-            </child>
-            <child>
-              <object class="GtkButton" id="test_delete_btn">
-                <property name="label" translatable="1">delete item(test)</property>
-                <property name="focusable">1</property>
-                <property name="receives-default">1</property>
-              </object>
-            </child>
           </object>
         </child>
       </object>

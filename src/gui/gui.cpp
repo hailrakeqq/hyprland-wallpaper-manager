@@ -1,38 +1,48 @@
 #include "../../include/gui.h"
 
-// TODO:зробити завантажувач картинок(алгоритм де є кількість картинок, і для
-// них створюється таблиця і заполняється)
-// TODO: додати сортування
-// TODO:in future items in matrix == image in playlist or im count
-uint itemsInMatrix = 0;
+// TODO: add sorting
 
-void gui::testAddItemToGrid() {
-  std::stringstream ss;
-  ss << "item " << itemsInMatrix;
+gui::gui(configurator *conf, imageManager *im, scheduler *s) {
+  this->conf = conf;
+  this->im = im;
+  this->s = s;
+}
 
-  std::string text = ss.str();
-  Gtk::Label label(text);
+void gui::onImageClick(Glib::ustring filename, int n_press, double x,
+                       double y) {
+  if (n_press == 1) {
+    wallpaperChanger::setWallpaper(conf->getMonitors(), filename);
+    std::cout << "Image clicked at x: " << x << ", y: " << y << std::endl;
+  }
+}
 
+void gui::insertImage(image *img) {
+  Gtk::Image imgFile(img->fullPath);
+  imgFile.set_name(img->fullPath);
   if (lastItemPosition.column < MAX_COLUMN - 1) {
-    imagesMatrix->attach(label, ++lastItemPosition.column,
+    imagesMatrix->attach(imgFile, ++lastItemPosition.column,
                          lastItemPosition.row);
   } else {
     imagesMatrix->insert_row(++lastItemPosition.row);
     lastItemPosition.column = -1;
-    imagesMatrix->attach(label, ++lastItemPosition.column,
+    imagesMatrix->attach(imgFile, ++lastItemPosition.column,
                          lastItemPosition.row);
   }
-  itemsInMatrix++;
+
+  Glib::RefPtr<Gtk::GestureClick> refGesture = Gtk::GestureClick::create();
+  refGesture->signal_pressed().connect(
+      [this, refGesture](int n_press, double x, double y) {
+        auto refWidget = refGesture->get_widget();
+        auto filename = refWidget->get_name();
+        onImageClick(filename, n_press, x, y);
+        std::cout << filename << std::endl;
+      });
+
+  imgFile.add_controller(refGesture);
 }
 
-void gui::testRemoveItemFromGrid() {
-  if (itemsInMatrix == 0) {
-    std::cout << "I can't delete item,nhfklgvfkdn" << std::endl;
-    return;
-  }
-
-  auto currentItem =
-      imagesMatrix->get_child_at(lastItemPosition.column, lastItemPosition.row);
+void gui::removeImage(uint8_t column, int row) {
+  auto currentItem = imagesMatrix->get_child_at(column, row);
 
   if (lastItemPosition.column > 0) {
     imagesMatrix->remove(*currentItem);
@@ -45,12 +55,10 @@ void gui::testRemoveItemFromGrid() {
   }
 }
 
-gui::gui(imageManager *im, scheduler *s) {
-  this->im = im;
-  this->s = s;
+void gui::imageLoader() {
+  for (auto img : im->getImages())
+    insertImage(&img);
 }
-
-void gui::exit() { delete mainwindow; }
 
 void gui::addWallpaperDirectory(Gtk::Window &window) {
   auto dialog = new Gtk::FileChooserDialog(
@@ -117,7 +125,6 @@ void gui::on_file_dialog_response(int response_id,
                                   Gtk::FileChooserDialog *dialog) {
   switch (response_id) {
   case Gtk::ResponseType::OK: {
-    // TODO: зробити можливим додавання >1 файла
     auto filename = dialog->get_file()->get_path();
     auto image = im->getImage(filename);
     im->addImage(image);
@@ -133,6 +140,8 @@ void gui::on_file_dialog_response(int response_id,
   }
   delete dialog;
 }
+
+void gui::refresh() { imageLoader(); }
 
 int8_t gui::on_app_activate() {
 #pragma region main
@@ -151,9 +160,14 @@ int8_t gui::on_app_activate() {
   }
 
   mainwindow = refBuilder->get_widget<Gtk::Window>("main_window");
+  imagesMatrix = refBuilder->get_widget<Gtk::Grid>("images_matrix");
 
   if (!mainwindow) {
     std::cerr << "Could not get the main window" << std::endl;
+    return -1;
+  }
+  if (!imagesMatrix) {
+    std::cerr << "Widget 'images_matrix' not found in gui.ui" << std::endl;
     return -1;
   }
 
@@ -164,12 +178,10 @@ int8_t gui::on_app_activate() {
   auto pAddWallpaperDirectoryBtn =
       refBuilder->get_widget<Gtk::Button>("add_wallpaper_directory_btn");
 
-  if (pExitBtn) {
-    pExitBtn->signal_clicked().connect([this]() { this->exit(); });
-  }
-  if (pRefreshBtn) {
-    pRefreshBtn->signal_clicked().connect([this]() { this->exit(); });
-  }
+  if (pExitBtn)
+    pExitBtn->signal_clicked().connect([this]() { delete mainwindow; });
+  if (pRefreshBtn)
+    pRefreshBtn->signal_clicked().connect([this]() { delete mainwindow; });
   if (pAddWallpaperBtn) {
     pAddWallpaperBtn->signal_clicked().connect(
         [this]() { this->addWallpaper(*mainwindow); });
@@ -178,29 +190,10 @@ int8_t gui::on_app_activate() {
     pAddWallpaperDirectoryBtn->signal_clicked().connect(
         [this]() { this->addWallpaperDirectory(*mainwindow); });
   }
-#pragma endregion
-
-#pragma region testgridChanger
-  auto pTestAddItem = refBuilder->get_widget<Gtk::Button>("test_add_btn");
-  auto pTestRemoveItem = refBuilder->get_widget<Gtk::Button>("test_delete_btn");
-  imagesMatrix = refBuilder->get_widget<Gtk::Grid>("images_matrix");
-
-  if (!imagesMatrix) {
-    std::cerr << "Widget 'images_matrix' not found in gui.ui" << std::endl;
-    return -1;
-  }
-
-  if (pTestAddItem) {
-    pTestAddItem->signal_clicked().connect([&] { this->testAddItemToGrid(); });
-  }
-
-  if (pTestRemoveItem) {
-    pTestRemoveItem->signal_clicked().connect(
-        [&] { this->testRemoveItemFromGrid(); });
-  }
 
 #pragma endregion
 
+  imageLoader();
   app->add_window(*mainwindow);
   mainwindow->set_visible(true);
 

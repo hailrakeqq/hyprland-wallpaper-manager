@@ -40,7 +40,7 @@ if(COMPILE_GUI)
     )
     add_definitions(-DCOMPILE_GUI)
     add_executable(hyprland-wallpaper-scheduler ${SRC} ${CORE_SRC} ${GUI})
-    target_link_libraries(hyprland-wallpaper-scheduler PRIVATE ${GTKMM_LIBRARIES})
+    target_link_libraries(hyprland-wallpaper-scheduler PRIVATE ${GTKMM_LIBRARIES} )
 else()
     set(TUI
         src/tui/tui.cpp

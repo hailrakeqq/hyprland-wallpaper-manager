@@ -11,7 +11,7 @@ int main(int argc, char **argv) {
   auto sched = new scheduler(config, im);
 
 #ifdef COMPILE_GUI
-  auto g = new gui(im, sched);
+  auto g = new gui(config, im, sched);
   g->run(argc, argv);
 
 #else

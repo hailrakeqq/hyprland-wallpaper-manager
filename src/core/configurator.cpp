@@ -29,7 +29,7 @@ void configurator::updateMonitors(std::string monitors) {
     saveConfig();
 }
 
-std::vector<wallpaper> configurator::getImagesFromConfig() {
+std::vector<wallpaper> configurator::getWallpapersFromConfig() {
     std::vector<wallpaper> images;
 
     for (auto jsonImage : configurator::config["images"]) {
@@ -49,7 +49,7 @@ void configurator::updateScheduler(json& scheduler) {
     saveConfig();
 }
 
-json configurator::createJsonImage(wallpaper* img) {
+json configurator::createJsonWallpaper(wallpaper* img) {
     json imageJson;
     imageJson["name"] = img->name;
     imageJson["fullPath"] = img->fullPath;
@@ -57,33 +57,28 @@ json configurator::createJsonImage(wallpaper* img) {
     return imageJson;
 }
 
-void configurator::addImage(wallpaper* img, imageType type) {
+void configurator::addWallpaper(wallpaper* img, imageType type) {
     if (isImageExistInConfig(img)) {
-        std::cout << "Image '" << img->fullPath << "' already exist in JSON."
-                  << std::endl;
         return;
     }
 
-    json imageJson = createJsonImage(img);
-    // auto target = type == IMAGE_MANAGER ? config["images"] :
-    // config["scheduler"]["playlist"];
-    if (type == IMAGE_MANAGER) {
+    json imageJson = createJsonWallpaper(img);
+
+    if (type == WALLPAPER_MANAGER)
         config["images"].push_back(imageJson);
-    } else {
+    else
         config["scheduler"]["playlist"].push_back(imageJson);
-    }
+
     saveConfig();
 }
 
 void configurator::removeWallpaper(wallpaper* img, imageType type) {
     if (isImageExistInConfig(img)) {
-        std::cout << "Image '" << img->fullPath << "' is not exist in the JSON."
-                  << std::endl;
         return;
     }
 
-    auto& target = type == IMAGE_MANAGER ? config["images"]
-                                         : config["scheduler"]["playlist"];
+    auto& target = type == WALLPAPER_MANAGER ? config["images"]
+                                             : config["scheduler"]["playlist"];
 
     for (auto it = target.begin(); it != target.end(); ++it) {
         if (it->at("fullPath") == img->fullPath) {
@@ -97,8 +92,8 @@ void configurator::removeWallpaper(wallpaper* img, imageType type) {
 }
 
 void configurator::removeWallpaper(uint index, imageType type) {
-    auto& target = type == IMAGE_MANAGER ? config["images"]
-                                         : config["scheduler"]["playlist"];
+    auto& target = type == WALLPAPER_MANAGER ? config["images"]
+                                             : config["scheduler"]["playlist"];
 
     target.erase(target.begin() + index);
 }
@@ -122,13 +117,16 @@ bool configurator::isImageExistInConfig(wallpaper* img) {
     if (file.is_open()) {
         try {
             file >> jsonData;
+            for (const auto& item : jsonData["images"]) {
+                if (item.is_object() && item.contains("fullPath") && item["fullPath"] == img->fullPath)
+                    return true;
+            }
         } catch (const std::exception& e) {
             std::cerr << "Error reading JSON: " << e.what() << std::endl;
-            return 1;
+            return false;
         }
-
-        return jsonData.contains(img->fullPath) ? true : false;
     }
+    return false;
 }
 
 void configurator::saveConfig() {

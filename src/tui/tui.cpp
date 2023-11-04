@@ -63,7 +63,7 @@ void tui::addImageToPlaylist() {
     getline(std::cin, imagePath);
 
     if (!imagePath.empty()) {
-        auto img = im.getImage(imagePath);
+        auto img = im.getWallpaper(imagePath);
         s.addImageToPlaylist(img);
         conf.saveConfig();
     }
@@ -108,7 +108,7 @@ void tui::removeImageFromImageManager() {
         return;
     }
 
-    im.deleteImage(index);
+    im.deleteWallpaper(index);
     conf.saveConfig();
     std::cout << "Image was successfully deleted" << std::endl;
 }

@@ -1,5 +1,5 @@
-#ifndef IMAGEMANAGER_H
-#define IMAGEMANAGER_H
+#ifndef WALLPAPERMANAGER_H
+#define WALLPAPERMANAGER_H
 
 #include "configurator.h"
 #include "utils.h"
@@ -14,27 +14,29 @@ class wallpaperManager {
 public:
     std::string monitors;
 
-    wallpaperManager(std::string imagesDirectoryPath);
+    wallpaperManager(std::string wallpapersDirectoryPath);
     wallpaperManager(configurator* conf);
 
     int getImagesCount();
     std::vector<wallpaper> getImages();
-    bool isImageExist(std::string imagePath);
-    wallpaper* getImage(std::string imagePath);
-    void addImage(wallpaper* img);
-    void addImages(std::string imagesDirectoryPath);
-    std::vector<wallpaper> getImages(std::string imagesDirectoryPath);
-    void deleteImage(wallpaper* img);
-    void deleteImage(int index);
-    void clearImages();
+    bool isWallpaperExist(std::string wallpaperPath);
+    wallpaper* getWallpaper(std::string wallpaperPath);
+    void addWallpaper(wallpaper* img);
+    void addWallpapers(std::string wallpapersDirectoryPath);
+    void addWallpapers(std::vector<wallpaper> wallpapers);
+    std::vector<wallpaper> getWallpapers(std::string wallpapersDirectoryPath);
+    std::vector<wallpaper> getWallpapers();
+    void deleteWallpaper(wallpaper* img);
+    void deleteWallpaper(int index);
+    void clearWallpapers();
 
 private:
     configurator* conf;
     int wallpaperCount;
-    std::string imagesDirectoryPath;
+    std::string wallpapersDirectoryPath;
     std::vector<wallpaper> wallpapers;
-    bool isValidImagesDirectory(std::string pathToDirectory);
+    bool isValidWallpapersDirectory(std::string pathToDirectory);
 
     std::vector<wallpaper> getFilesInDirectory(std::string& directoryPath);
 };
-#endif // !IMAGEMANAGER_H
+#endif // !WALLPAPERMANAGER_H

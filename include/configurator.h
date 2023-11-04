@@ -11,14 +11,16 @@
 using json = nlohmann::json;
 namespace fs = std::filesystem;
 
-enum imageType { IMAGE_MANAGER,
-    PLAYLIST };
+enum imageType {
+    WALLPAPER_MANAGER,
+    PLAYLIST
+};
 
 class configurator {
 public:
     configurator(std::string configFilePath);
-    std::vector<wallpaper> getImagesFromConfig();
-    void addImage(wallpaper* img, imageType type);
+    std::vector<wallpaper> getWallpapersFromConfig();
+    void addWallpaper(wallpaper* img, imageType type);
     void removeWallpaper(wallpaper* img, imageType type);
     void removeWallpaper(uint index, imageType type);
     void setImageSchedulerType(bool type);
@@ -30,7 +32,7 @@ public:
 
 private:
     bool isImageExistInConfig(wallpaper* img);
-    json createJsonImage(wallpaper* img);
+    json createJsonWallpaper(wallpaper* img);
     std::string configPath;
     json config;
 };

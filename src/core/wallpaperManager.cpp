@@ -6,21 +6,21 @@ void wallpaper::printFileDetails() {
     std::cout << "size: " << wallpaper::size << std::endl;
 }
 
-wallpaperManager::wallpaperManager(std::string imagesDirectoryPath) {
-    this->imagesDirectoryPath = imagesDirectoryPath;
-    addImages(imagesDirectoryPath);
+wallpaperManager::wallpaperManager(std::string wallpapersDirectoryPath) {
+    this->wallpapersDirectoryPath = wallpapersDirectoryPath;
+    addWallpapers(wallpapersDirectoryPath);
 }
 
 wallpaperManager::wallpaperManager(configurator* conf) {
     this->conf = conf;
     monitors = conf->getMonitors();
-    wallpapers = conf->getImagesFromConfig();
+    wallpapers = conf->getWallpapersFromConfig();
     wallpaperCount = wallpapers.size();
 }
 
-bool wallpaperManager::isImageExist(std::string imagePath) {
+bool wallpaperManager::isWallpaperExist(std::string wallpaperPath) {
     for (auto image : wallpapers) {
-        if (image.fullPath == imagePath)
+        if (image.fullPath == wallpaperPath)
             return true;
     }
     return false;
@@ -30,31 +30,40 @@ int wallpaperManager::getImagesCount() { return wallpaperCount; }
 
 std::vector<wallpaper> wallpaperManager::getImages() { return wallpapers; }
 
-wallpaper* wallpaperManager::getImage(std::string imagePath) {
-    if (!fs::is_regular_file(imagePath))
+wallpaper* wallpaperManager::getWallpaper(std::string wallpaperPath) {
+    if (!fs::is_regular_file(wallpaperPath))
         return nullptr;
 
     wallpaper* img = new wallpaper();
-    img->fullPath = imagePath;
-    img->name = utils::getFileName(imagePath);
-    img->size = utils::getFileSize(imagePath);
+    img->fullPath = wallpaperPath;
+    img->name = utils::getFileName(wallpaperPath);
+    img->size = utils::getFileSize(wallpaperPath);
 
     return img;
 }
 
-void wallpaperManager::addImage(wallpaper* img) {
-    if (!isImageExist(img->fullPath)) {
-        wallpapers.push_back(*img);
+void wallpaperManager::addWallpaper(wallpaper* wallpaper) {
+    if (!isWallpaperExist(wallpaper->fullPath)) {
+        wallpapers.push_back(*wallpaper);
         wallpaperCount++;
     }
 }
 
-// TODO: add check if it is image (.png .jpg etc...)
+void wallpaperManager::addWallpapers(std::vector<wallpaper> wallpapers) {
+    for (auto wallpaper : wallpapers) {
+        if (!isWallpaperExist(wallpaper.fullPath)) {
+            this->wallpapers.push_back(wallpaper);
+            wallpaperCount++;
+        }
+    }
+}
+
 std::vector<wallpaper>
 wallpaperManager::getFilesInDirectory(std::string& directoryPath) {
     std::vector<wallpaper> images;
     for (const auto& entry : fs::directory_iterator(directoryPath)) {
-        if (fs::is_regular_file(entry)) {
+        const std::string fileExtension = entry.path().extension();
+        if (fs::is_regular_file(entry) && (fileExtension == ".jpeg" || fileExtension == ".jpg" || fileExtension == ".png")) {
             wallpaper* img = new wallpaper();
             img->fullPath = entry.path().string();
             img->name = entry.path().filename();
@@ -66,7 +75,7 @@ wallpaperManager::getFilesInDirectory(std::string& directoryPath) {
     return images;
 }
 
-bool wallpaperManager::isValidImagesDirectory(std::string pathToDirectory) {
+bool wallpaperManager::isValidWallpapersDirectory(std::string pathToDirectory) {
     if (!fs::is_directory(pathToDirectory)) {
         std::cerr << pathToDirectory << " is not directory" << std::endl;
         return false;
@@ -81,11 +90,11 @@ bool wallpaperManager::isValidImagesDirectory(std::string pathToDirectory) {
     return true;
 }
 
-void wallpaperManager::addImages(std::string imagesDirectoryPath) {
-    if (isValidImagesDirectory(imagesDirectoryPath)) {
+void wallpaperManager::addWallpapers(std::string imagesDirectoryPath) {
+    if (isValidWallpapersDirectory(imagesDirectoryPath)) {
         auto images = getFilesInDirectory(imagesDirectoryPath);
         for (auto image : images) {
-            conf->addImage(&image, IMAGE_MANAGER);
+            conf->addWallpaper(&image, WALLPAPER_MANAGER);
             wallpaperManager::wallpapers.push_back(image);
             wallpaperCount++;
         }
@@ -94,15 +103,19 @@ void wallpaperManager::addImages(std::string imagesDirectoryPath) {
     }
 }
 
-std::vector<wallpaper> wallpaperManager::getImages(std::string imagesDirectoryPath) {
-    if (isValidImagesDirectory(imagesDirectoryPath))
+std::vector<wallpaper> wallpaperManager::getWallpapers(std::string imagesDirectoryPath) {
+    if (isValidWallpapersDirectory(imagesDirectoryPath))
         return getFilesInDirectory(imagesDirectoryPath);
     else
         std::cout << "Directory is not valid." << std::endl;
 }
 
-void wallpaperManager::deleteImage(wallpaper* img) {
-    if (!isImageExist(img->fullPath)) {
+std::vector<wallpaper> wallpaperManager::getWallpapers() {
+    return wallpapers;
+}
+
+void wallpaperManager::deleteWallpaper(wallpaper* img) {
+    if (!isWallpaperExist(img->fullPath)) {
         std::cerr << "File doesn't exist." << std::endl;
         return;
     }
@@ -116,17 +129,17 @@ void wallpaperManager::deleteImage(wallpaper* img) {
     }
 }
 
-void wallpaperManager::deleteImage(int index) {
+void wallpaperManager::deleteWallpaper(int index) {
     if (index <= wallpapers.size() - 1) {
         wallpapers.erase(wallpapers.begin() + index);
-        conf->removeWallpaper(index, IMAGE_MANAGER);
+        conf->removeWallpaper(index, WALLPAPER_MANAGER);
         wallpaperCount--;
     }
 }
 
-void wallpaperManager::clearImages() {
+void wallpaperManager::clearWallpapers() {
     for (auto wallpaper : wallpapers)
-        conf->removeWallpaper(&wallpaper, IMAGE_MANAGER);
+        conf->removeWallpaper(&wallpaper, WALLPAPER_MANAGER);
 
     wallpapers.clear();
     wallpaperCount = wallpapers.size();

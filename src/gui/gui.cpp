@@ -57,6 +57,8 @@ void gui::setRandom() {
 }
 
 void gui::wallpaperLoader() {
+    wm->clearWallpapers();
+    wm->addWallpapers(conf->getWallpapersFromConfig());
     for (auto img : wm->getImages())
         insertWallpaper(&img);
 }
@@ -107,7 +109,9 @@ void gui::on_folder_dialog_response(int response_id, Gtk::FileChooserDialog* dia
     switch (response_id) {
         case Gtk::ResponseType::OK: {
             auto directoryName = dialog->get_file()->get_path();
-            wm->addImages(directoryName);
+            wm->addWallpapers(directoryName);
+            for (auto wallpaper : wm->getWallpapers())
+                conf->addWallpaper(&wallpaper, WALLPAPER_MANAGER);
             break;
         }
         case Gtk::ResponseType::CANCEL: {
@@ -126,8 +130,9 @@ void gui::on_file_dialog_response(int response_id, Gtk::FileChooserDialog* dialo
     switch (response_id) {
         case Gtk::ResponseType::OK: {
             auto filename = dialog->get_file()->get_path();
-            auto image = wm->getImage(filename);
-            wm->addImage(image);
+            auto wallpaper = wm->getWallpaper(filename);
+            wm->addWallpaper(wallpaper);
+            conf->addWallpaper(wallpaper, WALLPAPER_MANAGER);
             break;
         }
         case Gtk::ResponseType::CANCEL: {

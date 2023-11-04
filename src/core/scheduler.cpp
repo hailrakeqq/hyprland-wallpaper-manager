@@ -77,7 +77,7 @@ void scheduler::setCurrentImage(wallpaper* img) { currentImage = *img; }
 
 void scheduler::addImageToPlaylist(wallpaper* img) {
     playlist.push_back(*img);
-    conf->addImage(img, PLAYLIST);
+    conf->addWallpaper(img, PLAYLIST);
 }
 
 void scheduler::removeImageFromPlaylist(wallpaper* img) {

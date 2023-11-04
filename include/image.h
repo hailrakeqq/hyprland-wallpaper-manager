@@ -3,10 +3,10 @@
 
 #include <string>
 typedef struct {
-  std::string name;
-  std::string fullPath;
-  long size;
+    std::string name;
+    std::string fullPath;
+    long size;
 
-  void printFileDetails();
+    void printFileDetails();
 } image;
 #endif // !IMAGE_H

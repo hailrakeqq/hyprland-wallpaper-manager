@@ -1,7 +1,7 @@
 #ifndef UTILS_H
 #define UTILS_H
 
-#include "../include/imageManager.h"
+#include "../include/wallpaperManager.h"
 #include <filesystem>
 #include <fstream>
 #include <iostream>
@@ -14,10 +14,10 @@ namespace utils {
     std::string getFileName(std::string filePath);
     int getImageIntervalTimeInMinutes(std::string interval);
     long getFileSize(std::string filePath);
-    std::vector<image>::iterator getItemIndexInVector(std::vector<image>& vec,
-        image* img);
+    std::vector<wallpaper>::iterator getItemIndexInVector(std::vector<wallpaper>& vec,
+        wallpaper* img);
 
     // template <typename T>
-    image getRandomItem(const std::vector<image>& arr);
+    wallpaper getRandomItem(const std::vector<wallpaper>& arr);
 } // namespace utils
 #endif // !UTILS_H

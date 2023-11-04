@@ -2,30 +2,27 @@
 
 // TODO: add sorting
 
-gui::gui(configurator* conf, imageManager* im, scheduler* s) {
+gui::gui(configurator* conf, wallpaperManager* wm, scheduler* s) {
     this->conf = conf;
-    this->im = im;
+    this->wm = wm;
     this->s = s;
 }
 
-void gui::onImageClick(Glib::ustring filename, int n_press, double x,
-    double y) {
-    if (n_press == 1) {
+void gui::onWallpaperClick(Glib::ustring filename, int n_press, double x, double y) {
+    if (n_press == 1)
         wallpaperChanger::setWallpaper(conf->getMonitors(), filename);
-        std::cout << "Image clicked at x: " << x << ", y: " << y << std::endl;
-    }
 }
 
-void gui::insertImage(image* img) {
+void gui::insertWallpaper(wallpaper* img) {
     Gtk::Image imgFile(img->fullPath);
     imgFile.set_name(img->fullPath);
 
     if (lastItemPosition.column < MAX_COLUMN - 1) {
-        imagesMatrix->attach(imgFile, ++lastItemPosition.column, lastItemPosition.row);
+        wallpapersMatrix->attach(imgFile, ++lastItemPosition.column, lastItemPosition.row);
     } else {
-        imagesMatrix->insert_row(++lastItemPosition.row);
+        wallpapersMatrix->insert_row(++lastItemPosition.row);
         lastItemPosition.column = -1;
-        imagesMatrix->attach(imgFile, ++lastItemPosition.column, lastItemPosition.row);
+        wallpapersMatrix->attach(imgFile, ++lastItemPosition.column, lastItemPosition.row);
     }
 
     Glib::RefPtr<Gtk::GestureClick> refGesture = Gtk::GestureClick::create();
@@ -34,29 +31,34 @@ void gui::insertImage(image* img) {
             auto refWidget = refGesture->get_widget();
             auto filename = refWidget->get_name();
 
-            onImageClick(filename, n_press, x, y);
+            onWallpaperClick(filename, n_press, x, y);
         });
 
     imgFile.add_controller(refGesture);
 }
 
-void gui::removeImage(uint8_t column, int row) {
-    auto currentItem = imagesMatrix->get_child_at(column, row);
+void gui::removeWallpaper(uint8_t column, int row) {
+    auto currentItem = wallpapersMatrix->get_child_at(column, row);
 
     if (lastItemPosition.column > 0) {
-        imagesMatrix->remove(*currentItem);
+        wallpapersMatrix->remove(*currentItem);
         lastItemPosition.column--;
     } else {
-        imagesMatrix->remove(*currentItem);
+        wallpapersMatrix->remove(*currentItem);
         lastItemPosition.column = MAX_COLUMN - 1;
-        imagesMatrix->remove_row(lastItemPosition.row);
+        wallpapersMatrix->remove_row(lastItemPosition.row);
         lastItemPosition.row--;
     }
 }
 
-void gui::imageLoader() {
-    for (auto img : im->getImages())
-        insertImage(&img);
+void gui::setRandom() {
+    auto randomWllpr = utils::getRandomItem(wm->getImages());
+    wallpaperChanger::setWallpaper(conf->getMonitors(), &randomWllpr);
+}
+
+void gui::wallpaperLoader() {
+    for (auto img : wm->getImages())
+        insertWallpaper(&img);
 }
 
 void gui::addWallpaperDirectory(Gtk::Window& window) {
@@ -101,12 +103,11 @@ void gui::addWallpaper(Gtk::Window& window) {
     dialog->show();
 }
 
-void gui::on_folder_dialog_response(int response_id,
-    Gtk::FileChooserDialog* dialog) {
+void gui::on_folder_dialog_response(int response_id, Gtk::FileChooserDialog* dialog) {
     switch (response_id) {
         case Gtk::ResponseType::OK: {
             auto directoryName = dialog->get_file()->get_path();
-            im->addImages(directoryName);
+            wm->addImages(directoryName);
             break;
         }
         case Gtk::ResponseType::CANCEL: {
@@ -121,13 +122,12 @@ void gui::on_folder_dialog_response(int response_id,
     delete dialog;
 }
 
-void gui::on_file_dialog_response(int response_id,
-    Gtk::FileChooserDialog* dialog) {
+void gui::on_file_dialog_response(int response_id, Gtk::FileChooserDialog* dialog) {
     switch (response_id) {
         case Gtk::ResponseType::OK: {
             auto filename = dialog->get_file()->get_path();
-            auto image = im->getImage(filename);
-            im->addImage(image);
+            auto image = wm->getImage(filename);
+            wm->addImage(image);
             break;
         }
         case Gtk::ResponseType::CANCEL: {
@@ -141,10 +141,19 @@ void gui::on_file_dialog_response(int response_id,
     delete dialog;
 }
 
-void gui::refresh() { imageLoader(); }
+void gui::clearMatrix() {
+    int itemsInMatrix = (lastItemPosition.column + 1) + (lastItemPosition.row * 4);
+
+    for (int i = itemsInMatrix; i > 0; i--)
+        removeWallpaper(lastItemPosition.column, lastItemPosition.row);
+}
+
+void gui::refresh() {
+    clearMatrix();
+    wallpaperLoader();
+}
 
 int8_t gui::on_app_activate() {
-#pragma region main
     auto refBuilder = Gtk::Builder::create();
     try {
         refBuilder->add_from_file("../gui.ui");
@@ -160,38 +169,35 @@ int8_t gui::on_app_activate() {
     }
 
     mainwindow = refBuilder->get_widget<Gtk::Window>("main_window");
-    imagesMatrix = refBuilder->get_widget<Gtk::Grid>("images_matrix");
+    wallpapersMatrix = refBuilder->get_widget<Gtk::Grid>("images_matrix");
 
     if (!mainwindow) {
         std::cerr << "Could not get the main window" << std::endl;
         return -1;
     }
-    if (!imagesMatrix) {
+    if (!wallpapersMatrix) {
         std::cerr << "Widget 'images_matrix' not found in gui.ui" << std::endl;
         return -1;
     }
 
     auto pExitBtn = refBuilder->get_widget<Gtk::Button>("exit_btn");
     auto pRefreshBtn = refBuilder->get_widget<Gtk::Button>("refresh_btn");
-    auto pAddWallpaperBtn =
-        refBuilder->get_widget<Gtk::Button>("add_wallpaper_btn");
-    auto pAddWallpaperDirectoryBtn =
-        refBuilder->get_widget<Gtk::Button>("add_wallpaper_directory_btn");
+    auto pRandomBtn = refBuilder->get_widget<Gtk::Button>("random_btn");
+    auto pAddWallpaperBtn = refBuilder->get_widget<Gtk::Button>("add_wallpaper_btn");
+    auto pAddWallpaperDirectoryBtn = refBuilder->get_widget<Gtk::Button>("add_wallpaper_directory_btn");
 
     if (pExitBtn)
         pExitBtn->signal_clicked().connect([this]() { delete mainwindow; });
+    if (pRandomBtn)
+        pRandomBtn->signal_clicked().connect([this]() { this->setRandom(); });
     if (pRefreshBtn)
-        pRefreshBtn->signal_clicked().connect([this]() { delete mainwindow; });
-    if (pAddWallpaperBtn) {
+        pRefreshBtn->signal_clicked().connect([this]() { this->refresh(); });
+    if (pAddWallpaperBtn)
         pAddWallpaperBtn->signal_clicked().connect([this]() { this->addWallpaper(*mainwindow); });
-    }
-    if (pAddWallpaperDirectoryBtn) {
+    if (pAddWallpaperDirectoryBtn)
         pAddWallpaperDirectoryBtn->signal_clicked().connect([this]() { this->addWallpaperDirectory(*mainwindow); });
-    }
 
-#pragma endregion
-
-    imageLoader();
+    wallpaperLoader();
     app->add_window(*mainwindow);
     mainwindow->set_visible(true);
 

@@ -29,11 +29,11 @@ void configurator::updateMonitors(std::string monitors) {
     saveConfig();
 }
 
-std::vector<image> configurator::getImagesFromConfig() {
-    std::vector<image> images;
+std::vector<wallpaper> configurator::getImagesFromConfig() {
+    std::vector<wallpaper> images;
 
     for (auto jsonImage : configurator::config["images"]) {
-        image img;
+        wallpaper img;
         img.fullPath = jsonImage["fullPath"];
         img.name = jsonImage["name"];
         img.size = jsonImage["size"];
@@ -49,7 +49,7 @@ void configurator::updateScheduler(json& scheduler) {
     saveConfig();
 }
 
-json configurator::createJsonImage(image* img) {
+json configurator::createJsonImage(wallpaper* img) {
     json imageJson;
     imageJson["name"] = img->name;
     imageJson["fullPath"] = img->fullPath;
@@ -57,7 +57,7 @@ json configurator::createJsonImage(image* img) {
     return imageJson;
 }
 
-void configurator::addImage(image* img, imageType type) {
+void configurator::addImage(wallpaper* img, imageType type) {
     if (isImageExistInConfig(img)) {
         std::cout << "Image '" << img->fullPath << "' already exist in JSON."
                   << std::endl;
@@ -75,7 +75,7 @@ void configurator::addImage(image* img, imageType type) {
     saveConfig();
 }
 
-void configurator::removeImage(image* img, imageType type) {
+void configurator::removeWallpaper(wallpaper* img, imageType type) {
     if (isImageExistInConfig(img)) {
         std::cout << "Image '" << img->fullPath << "' is not exist in the JSON."
                   << std::endl;
@@ -96,7 +96,7 @@ void configurator::removeImage(image* img, imageType type) {
               << std::endl;
 }
 
-void configurator::removeImage(uint index, imageType type) {
+void configurator::removeWallpaper(uint index, imageType type) {
     auto& target = type == IMAGE_MANAGER ? config["images"]
                                          : config["scheduler"]["playlist"];
 
@@ -115,7 +115,7 @@ std::string configurator::getMonitors() {
     return result;
 }
 
-bool configurator::isImageExistInConfig(image* img) {
+bool configurator::isImageExistInConfig(wallpaper* img) {
     std::ifstream file("config.json");
     json jsonData;
 

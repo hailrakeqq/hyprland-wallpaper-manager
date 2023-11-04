@@ -34,7 +34,7 @@ namespace utils {
         return fileSize;
     }
 
-    image getRandomItem(const std::vector<image>& arr) {
+    wallpaper getRandomItem(const std::vector<wallpaper>& arr) {
         if (arr.empty())
             throw std::invalid_argument("The array is empty");
 
@@ -46,8 +46,8 @@ namespace utils {
         return arr[randomIndex];
     }
 
-    std::vector<image>::iterator getItemIndexInVector(std::vector<image>& vec,
-        image* img) {
+    std::vector<wallpaper>::iterator getItemIndexInVector(std::vector<wallpaper>& vec,
+        wallpaper* img) {
         for (auto i = vec.begin(); i != vec.end(); ++i) {
             if (i->fullPath == img->fullPath)
                 return i;

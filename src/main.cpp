@@ -6,7 +6,7 @@
 
 int main(int argc, char** argv) {
     auto config = new configurator("config.json");
-    auto im = new imageManager(config);
+    auto im = new wallpaperManager(config);
 
     auto sched = new scheduler(config, im);
 

@@ -8,5 +8,5 @@ typedef struct {
     long size;
 
     void printFileDetails();
-} image;
+} wallpaper;
 #endif // !IMAGE_H

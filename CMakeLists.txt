@@ -27,7 +27,7 @@ set(SRC
 )
 
 set(CORE_SRC
-    src/core/imageManager.cpp
+    src/core/wallpaperManager.cpp
     src/core/wallpaperChanger.cpp
     src/core/scheduler.cpp
     src/core/configurator.cpp

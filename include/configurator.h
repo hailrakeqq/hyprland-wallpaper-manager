@@ -1,7 +1,7 @@
 #ifndef CONFIGURATOR_H
 #define CONFIGURATOR_H
 
-#include "image.h"
+#include "wallpaper.h"
 #include <filesystem>
 #include <fstream>
 #include <iostream>
@@ -17,10 +17,10 @@ enum imageType { IMAGE_MANAGER,
 class configurator {
 public:
     configurator(std::string configFilePath);
-    std::vector<image> getImagesFromConfig();
-    void addImage(image* img, imageType type);
-    void removeImage(image* img, imageType type);
-    void removeImage(uint index, imageType type);
+    std::vector<wallpaper> getImagesFromConfig();
+    void addImage(wallpaper* img, imageType type);
+    void removeWallpaper(wallpaper* img, imageType type);
+    void removeWallpaper(uint index, imageType type);
     void setImageSchedulerType(bool type);
     void updateScheduler(json& scheduler);
     void updateMonitors(std::string monitors);
@@ -29,8 +29,8 @@ public:
     void saveConfig();
 
 private:
-    bool isImageExistInConfig(image* img);
-    json createJsonImage(image* img);
+    bool isImageExistInConfig(wallpaper* img);
+    json createJsonImage(wallpaper* img);
     std::string configPath;
     json config;
 };

@@ -1,6 +1,6 @@
 #include "../include/tui.h"
 
-tui::tui(imageManager& im, scheduler& s, configurator& conf)
+tui::tui(wallpaperManager& im, scheduler& s, configurator& conf)
         : im(im)
         , s(s)
         , conf(conf) {
@@ -34,11 +34,11 @@ void tui::changeImage() {
 }
 
 void tui::setRandom() {
-    std::vector<image> images = im.getImages();
-    image currentImg = s.getCurrentImage();
+    std::vector<wallpaper> images = im.getImages();
+    wallpaper currentImg = s.getCurrentImage();
 
 checkIsCurrentImageNotEqualRandomImage:
-    image imageToSet = utils::getRandomItem(images);
+    wallpaper imageToSet = utils::getRandomItem(images);
 
     if (currentImg.fullPath == imageToSet.fullPath) {
         goto checkIsCurrentImageNotEqualRandomImage;

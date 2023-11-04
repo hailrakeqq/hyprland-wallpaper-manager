@@ -1,15 +1,15 @@
 #ifndef TUI_H
 #define TUI_H
 
-#include "imageManager.h"
 #include "scheduler.h"
 #include "wallpaperChanger.h"
+#include "wallpaperManager.h"
 #include <iostream>
 #include <vector>
 
 class tui {
 public:
-    tui(imageManager& im, scheduler& s, configurator& conf);
+    tui(wallpaperManager& wm, scheduler& s, configurator& conf);
     void renderMenu();
     void showImages();
     void addImagesToImageManager();
@@ -26,7 +26,7 @@ public:
     void changeDisplay();
 
 private:
-    imageManager& im;
+    wallpaperManager& wm;
     scheduler& s;
     configurator& conf;
 };

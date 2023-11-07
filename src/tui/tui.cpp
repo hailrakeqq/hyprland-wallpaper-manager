@@ -1,27 +1,29 @@
-#include "../include/cmdUI.h"
+#include "../include/tui.h"
 
-cmdUI::cmdUI(imageManager& im, scheduler &s, configurator& conf) : im(im), s(s), conf(conf){
+tui::tui(wallpaperManager& im, scheduler& s, configurator& conf)
+        : im(im)
+        , s(s)
+        , conf(conf) {
     this->im = im;
     this->s = s;
     this->conf = conf;
 }
 
-void cmdUI::showImages()
-{
+void tui::showImages() {
     auto images = im.getImages();
     for (int i = 0; i < images.size(); i++)
         std::cout << '[' << i << ']' << " " << images[i].name << std::endl;
 }
 
-void cmdUI::changeImage(){
+void tui::changeImage() {
     std::cout << "Enter image index: ";
     int index;
     std::cin >> index;
-    if(index < im.getImagesCount()){
+    if (index < im.getImagesCount()) {
         auto images = im.getImages();
         auto result = wallpaperChanger::setWallpaper(im.monitors, &images[index]);
 
-        if(result){
+        if (result) {
             std::cout << "Wallpaper successfully changed." << std::endl;
             return;
         }
@@ -31,63 +33,62 @@ void cmdUI::changeImage(){
     std::cerr << "Index that you enter was outside of range." << std::endl;
 }
 
-void cmdUI::setRandom(){
-    std::vector<image> images = im.getImages();
-    image currentImg = s.getCurrentImage();
+void tui::setRandom() {
+    std::vector<wallpaper> images = im.getImages();
+    wallpaper currentImg = s.getCurrentImage();
 
-    checkIsCurrentImageNotEqualRandomImage:
-    image imageToSet = utils::getRandomItem(images);
-   
-    if(currentImg.fullPath == imageToSet.fullPath){
+checkIsCurrentImageNotEqualRandomImage:
+    wallpaper imageToSet = utils::getRandomItem(images);
+
+    if (currentImg.fullPath == imageToSet.fullPath) {
         goto checkIsCurrentImageNotEqualRandomImage;
     }
-    
 
     wallpaperChanger::setWallpaper(im.monitors, &imageToSet);
     s.setCurrentImage(&imageToSet);
 }
 
-void cmdUI::addImagesToImageManager(){
+void tui::addImagesToImageManager() {
     std::cout << "Enter path to wallpaper directory: ";
     std::string path;
     getline(std::cin, path);
-    
+
     im.addImages(path);
     std::cout << "Image was successfully added to image manager" << std::endl;
 }
 
-void cmdUI::addImageToPlaylist(){
+void tui::addImageToPlaylist() {
     std::cout << "Enter path to image: ";
     std::string imagePath;
     getline(std::cin, imagePath);
 
-    if(!imagePath.empty()){
-        auto img = im.getImage(imagePath);
+    if (!imagePath.empty()) {
+        auto img = im.getWallpaper(imagePath);
         s.addImageToPlaylist(img);
         conf.saveConfig();
     }
 }
 
-void cmdUI::addImagesToPlaylist(){
+void tui::addImagesToPlaylist() {
     std::cout << "Enter path to directory: " << std::endl;
     std::string imagesDirectoryPath;
     getline(std::cin, imagesDirectoryPath);
 
-    if(!imagesDirectoryPath.empty()){
+    if (!imagesDirectoryPath.empty()) {
         auto images = im.getImages(imagesDirectoryPath);
-        for(auto image: images)
+        for (auto image : images)
             s.addImageToPlaylist(&image);
 
         conf.saveConfig();
     }
 }
 
-void cmdUI::removeImageFromPlaylist(){
+void tui::removeImageFromPlaylist() {
     int index;
     std::cout << "Enter image index to delete: ";
     std::cin >> index;
 
-    if(index > s.playlistSize()){
+    if (index > s.playlistSize()) {
         std::cout << "Index is greater than count images in playlist" << std::endl;
         return;
     }
@@ -96,22 +97,23 @@ void cmdUI::removeImageFromPlaylist(){
     conf.saveConfig();
 }
 
-void cmdUI::removeImageFromImageManager(){
+void tui::removeImageFromImageManager() {
     std::cout << "Enter image index to delete: ";
     int index;
     std::cin >> index;
 
-    if(index > im.getImagesCount()){
-        std::cout << "Index is greater than count images in image manager" << std::endl;
+    if (index > im.getImagesCount()) {
+        std::cout << "Index is greater than count images in image manager"
+                  << std::endl;
         return;
     }
 
-    im.deleteImage(index);
+    im.deleteWallpaper(index);
     conf.saveConfig();
     std::cout << "Image was successfully deleted" << std::endl;
 }
 
-void cmdUI::playlistSettings(){
+void tui::playlistSettings() {
     int option;
     do {
         std::cout << "Playlist settings:" << std::endl;
@@ -125,8 +127,7 @@ void cmdUI::playlistSettings(){
         std::cin.clear();
         std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
-        switch (option)
-        {
+        switch (option) {
             case 1:
                 addImageToPlaylist();
                 break;
@@ -143,79 +144,80 @@ void cmdUI::playlistSettings(){
     } while (option != 4);
 }
 
-void cmdUI::showPlaylist(){
-    for(auto image : s.getPlaylist())
+void tui::showPlaylist() {
+    for (auto image : s.getPlaylist())
         image.printFileDetails();
 }
 
-void cmdUI::changeInterval(){
-    std::cout << "Enter new interval(example: \"2.30\" - 2 hour 30 minutes.): " << std::endl;
+void tui::changeInterval() {
+    std::cout << "Enter new interval(example: \"2.30\" - 2 hour 30 minutes.): "
+              << std::endl;
     std::string newInterval;
     std::cin >> newInterval;
     s.changeInterval(newInterval);
 }
 
-void cmdUI::changeDisplay(){
-    std::cout << "Enter monitor(s) on which you want set wallpaper(example \"DP-1, DP-2\"): ";
+void tui::changeDisplay() {
+    std::cout << "Enter monitor(s) on which you want set wallpaper(example "
+                 "\"DP-1, DP-2\"): ";
     std::string monitorInput;
     std::getline(std::cin, monitorInput);
-    if(!monitorInput.empty()){
+    if (!monitorInput.empty()) {
         im.monitors = monitorInput;
         conf.updateMonitors(monitorInput);
     }
 }
 
-void cmdUI::schedulerMenu(){
+void tui::schedulerMenu() {
     int choice;
     do {
         std::cout << "Scheduler Menu:" << std::endl;
         std::cout << "1. start" << std::endl;
         std::cout << "2. stop" << std::endl;
-        std::cout << "3. show playlist" << std::endl;    
-        if(s.isRandomImage())
+        std::cout << "3. show playlist" << std::endl;
+        if (s.isRandomImage())
             std::cout << "4. set playlist image?" << std::endl;
-        else 
+        else
             std::cout << "4. set random image?" << std::endl;
-        std::cout << "5. playlist settings" << std::endl;        
+        std::cout << "5. playlist settings" << std::endl;
         std::cout << "6. settings" << std::endl;
         std::cout << "7. Exit" << std::endl;
         std::cout << "Choose option: ";
-        
+
         std::cin >> choice;
         std::cin.clear();
         std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
-        switch (choice)
-        {
-        case 1:
-            s.start();
-            break;
-        case 2:
-            s.stop();
-            break;
-        case 3:
-            showPlaylist();
-            break;
-        case 4:
-            s.setRandomImage();
-            break;
-        case 5:
-            playlistSettings();
-            break;
-        case 6:
-            changeInterval();
-            break;
-        case 7:
-            std::cout << "Exit..." << std::endl;
-            break;
-        default:
-            std::cout << "Incorrect choose." << std::endl;
-            break;
+        switch (choice) {
+            case 1:
+                s.start();
+                break;
+            case 2:
+                s.stop();
+                break;
+            case 3:
+                showPlaylist();
+                break;
+            case 4:
+                s.setRandomImage();
+                break;
+            case 5:
+                playlistSettings();
+                break;
+            case 6:
+                changeInterval();
+                break;
+            case 7:
+                std::cout << "Exit..." << std::endl;
+                break;
+            default:
+                std::cout << "Incorrect choose." << std::endl;
+                break;
         }
     } while (choice != 7);
 }
 
-void cmdUI::renderMenu(){
+void tui::renderMenu() {
     int choice;
     do {
         std::cout << "Menu:" << std::endl;
@@ -224,11 +226,11 @@ void cmdUI::renderMenu(){
         std::cout << "3. remove image directory" << std::endl;
         std::cout << "4. set random wallpaper" << std::endl;
         std::cout << "5. set wallpaper" << std::endl;
-        std::cout << "6. scheduler" << std::endl;        
+        std::cout << "6. scheduler" << std::endl;
         std::cout << "7. settings" << std::endl;
         std::cout << "8. Exit" << std::endl;
         std::cout << "Choose option: ";
-        
+
         std::cin >> choice;
         std::cin.clear();
         std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');

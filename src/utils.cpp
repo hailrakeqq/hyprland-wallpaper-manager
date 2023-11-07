@@ -1,13 +1,12 @@
 #include "../include/utils.h"
 
-namespace utils
-{
+namespace utils {
     std::string getFileName(std::string filePath) {
         std::filesystem::path path(filePath);
         return path.filename().string();
     }
 
-    int getImageIntervalTimeInMinutes(std::string interval){
+    int getImageIntervalTimeInMinutes(std::string interval) {
         int hours, minutes;
         size_t dotPos = interval.find('.');
         if (dotPos != std::string::npos) {
@@ -22,9 +21,9 @@ namespace utils
         return totalMinutes;
     }
 
-    long getFileSize(std::string filePath){
+    long getFileSize(std::string filePath) {
         std::ifstream file(filePath, std::ios::binary);
-        if(!file){
+        if (!file) {
             std::cerr << "Can't open file." << std::endl;
             return 1;
         }
@@ -35,11 +34,9 @@ namespace utils
         return fileSize;
     }
 
-    image getRandomItem(const std::vector<image> &arr)
-    {
-        if (arr.empty()) 
+    wallpaper getRandomItem(const std::vector<wallpaper>& arr) {
+        if (arr.empty())
             throw std::invalid_argument("The array is empty");
-        
 
         std::random_device rd;
         std::mt19937 gen(rd());
@@ -49,11 +46,12 @@ namespace utils
         return arr[randomIndex];
     }
 
-    std::vector<image>::iterator getItemIndexInVector(std::vector<image> & vec, image *img){
+    std::vector<wallpaper>::iterator getItemIndexInVector(std::vector<wallpaper>& vec,
+        wallpaper* img) {
         for (auto i = vec.begin(); i != vec.end(); ++i) {
-            if (i->fullPath == img->fullPath) 
+            if (i->fullPath == img->fullPath)
                 return i;
         }
         return vec.end();
     }
-}
+} // namespace utils

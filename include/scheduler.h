@@ -1,30 +1,30 @@
 #ifndef SCHEDULER_H
 #define SCHEDULER_H
 
-#include <vector>
+#include <chrono>
 #include <string>
 #include <thread>
-#include <chrono>
+#include <vector>
 
-#include "image.h"
 #include "configurator.h"
 #include "utils.h"
+#include "wallpaper.h"
 #include "wallpaperChanger.h"
 
 class scheduler {
 public:
-    scheduler(configurator *conf, imageManager *im);
-    scheduler(std::string interval, configurator *conf, imageManager*im);
+    scheduler(configurator* conf, wallpaperManager* wm);
+    scheduler(std::string interval, configurator* conf, wallpaperManager* wm);
 
     json toJson();
-    
-    void addImageToPlaylist(image *img);
-    void removeImageFromPlaylist(image *img);
+
+    void addImageToPlaylist(wallpaper* img);
+    void removeImageFromPlaylist(wallpaper* img);
     void removeImageFromPlaylist(uint index);
     int playlistSize();
-    
-    image getCurrentImage();
-    void setCurrentImage(image* img);
+
+    wallpaper getCurrentImage();
+    void setCurrentImage(wallpaper* img);
 
     bool isRandomImage();
     void setRandomImage();
@@ -33,16 +33,16 @@ public:
     void scheduleImage();
     void stop();
     void changeInterval(std::string interval);
-    
-    std::vector<image> getPlaylist();
+
+    std::vector<wallpaper> getPlaylist();
 
 private:
-    configurator *conf;
-    imageManager *im;
+    configurator* conf;
+    wallpaperManager* wm;
     bool isSchedulerRun;
     bool randomImage;
-    std::vector<image> playlist;
-    image currentImage;
+    std::vector<wallpaper> playlist;
+    wallpaper currentImage;
     uint currentImageIndex;
     int interval;
 };

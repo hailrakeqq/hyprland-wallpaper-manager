@@ -1,40 +1,38 @@
 #ifndef CONFIGURATOR_H
 #define CONFIGURATOR_H
 
-#include <string>
-#include <iostream>
-#include <fstream>
-#include <nlohmann/json.hpp>
+#include "wallpaper.h"
 #include <filesystem>
-#include "image.h"
+#include <fstream>
+#include <iostream>
+#include <nlohmann/json.hpp>
+#include <string>
 
 using json = nlohmann::json;
 namespace fs = std::filesystem;
 
-enum imageType
-{
-    IMAGE_MANAGER,
+enum imageType {
+    WALLPAPER_MANAGER,
     PLAYLIST
 };
 
-class configurator
-{
+class configurator {
 public:
     configurator(std::string configFilePath);
-    std::vector<image> getImagesFromConfig();
-    void addImage(image *img, imageType type);
-    void removeImage(image *img, imageType type);
-    void removeImage(uint index, imageType type);
+    std::vector<wallpaper> getWallpapersFromConfig();
+    void addWallpaper(wallpaper* img, imageType type);
+    void removeWallpaper(wallpaper* img, imageType type);
+    void removeWallpaper(uint index, imageType type);
     void setImageSchedulerType(bool type);
-    void updateScheduler(json &scheduler);
+    void updateScheduler(json& scheduler);
     void updateMonitors(std::string monitors);
     json getConfig();
     std::string getMonitors();
     void saveConfig();
 
 private:
-    bool isImageExistInConfig(image *img);
-    json createJsonImage(image *img);
+    bool isImageExistInConfig(wallpaper* img);
+    json createJsonWallpaper(wallpaper* img);
     std::string configPath;
     json config;
 };

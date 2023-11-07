@@ -2,3 +2,8 @@
 /build/*
 json/
 config.json
+
+gui.glade~
+gui.glade
+popupwindow.glade
+popupwindow.glade~

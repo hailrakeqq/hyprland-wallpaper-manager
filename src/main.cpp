@@ -1,16 +1,22 @@
-#include <iostream>
 #include "../include/configurator.h"
-#include "../include/cmdUI.h"
+#include "../include/gui.h"
 #include "../include/scheduler.h"
+#include "../include/tui.h"
 
-int main()
-{
-    auto config = configurator("config.json");
-    auto im = imageManager(&config);
+int main(int argc, char** argv) {
+    auto config = new configurator("config.json");
+    auto im = new wallpaperManager(config);
 
-    auto sched = new scheduler(&config, &im);
+    auto sched = new scheduler(config, im);
 
-    auto menu = cmdUI(im, *sched, config);
-    menu.renderMenu();
+#ifdef COMPILE_GUI
+    auto g = new gui(config, im, sched);
+    g->run(argc, argv);
+
+#else
+    auto tuiMenu = tui(im, *sched, config);
+    tuiMenu.renderMenu();
+#endif
+
     return 0;
 }

@@ -1,9 +1,9 @@
 #include "../../include/scheduler.h"
 
-scheduler::scheduler(configurator *conf, imageManager *im){
+scheduler::scheduler(configurator* conf, wallpaperManager* wm) {
     auto config = conf->getConfig();
     std::ifstream jsonFile("config.json");
-    if(!jsonFile.is_open()){
+    if (!jsonFile.is_open()) {
         std::cerr << "Failed to open config file." << std::endl;
         return;
     }
@@ -12,15 +12,15 @@ scheduler::scheduler(configurator *conf, imageManager *im){
     jsonFile >> jsonData;
     jsonFile.close();
 
-    if(jsonData.contains("scheduler") && !jsonData["scheduler"].empty()){
+    if (jsonData.contains("scheduler") && !jsonData["scheduler"].empty()) {
         json scheduler = jsonData["scheduler"];
         json playlist = scheduler["playlist"];
         randomImage = scheduler["isRandomImage"];
         this->interval = scheduler["interval"];
 
-        for(auto item : playlist){
-            image img;
-          
+        for (auto item : playlist) {
+            wallpaper img;
+
             img.fullPath = item["fullPath"];
             img.name = item["name"];
             img.size = item["size"];
@@ -29,9 +29,8 @@ scheduler::scheduler(configurator *conf, imageManager *im){
         }
     }
 
-    // currentImage = NULL;
     currentImageIndex = 0;
-    this->im = im;
+    this->wm = wm;
     this->conf = conf;
     isSchedulerRun = false;
 
@@ -39,20 +38,20 @@ scheduler::scheduler(configurator *conf, imageManager *im){
     conf->updateScheduler(schedulerJson);
 }
 
-scheduler::scheduler(std::string interval, configurator *conf, imageManager *im){
+scheduler::scheduler(std::string interval, configurator* conf, wallpaperManager* wm) {
     int intervalInMinutes = utils::getImageIntervalTimeInMinutes(interval);
-    if(intervalInMinutes == -1)
+    if (intervalInMinutes == -1)
         this->interval = 0;
     else
         this->interval = intervalInMinutes;
 
     currentImageIndex = 0;
-    this->im = im;
+    this->wm = wm;
     isSchedulerRun = false;
     randomImage = true;
 }
 
-json scheduler::toJson(){
+json scheduler::toJson() {
     json jsonObject;
     jsonObject["isRandomImage"] = randomImage;
     jsonObject["interval"] = interval;
@@ -72,103 +71,92 @@ json scheduler::toJson(){
     return jsonObject;
 }
 
-image scheduler::getCurrentImage(){
-    return currentImage;
-}
+wallpaper scheduler::getCurrentImage() { return currentImage; }
 
-void scheduler::setCurrentImage(image* img){
-    currentImage = *img;
-}
+void scheduler::setCurrentImage(wallpaper* img) { currentImage = *img; }
 
-void scheduler::addImageToPlaylist(image *img){
+void scheduler::addImageToPlaylist(wallpaper* img) {
     playlist.push_back(*img);
-    conf->addImage(img, PLAYLIST);
+    conf->addWallpaper(img, PLAYLIST);
 }
 
-void scheduler::removeImageFromPlaylist(image *img){
-    for (uint i = 0; i < playlist.size(); i++){
-        if(playlist[i].fullPath == img->fullPath){
+void scheduler::removeImageFromPlaylist(wallpaper* img) {
+    for (uint i = 0; i < playlist.size(); i++) {
+        if (playlist[i].fullPath == img->fullPath) {
             playlist.erase(playlist.begin() + i);
-            conf->removeImage(img, PLAYLIST);
+            conf->removeWallpaper(img, PLAYLIST);
         }
     }
 }
 
-void scheduler::removeImageFromPlaylist(uint index){
-    if(index > playlist.size()){
+void scheduler::removeImageFromPlaylist(uint index) {
+    if (index > playlist.size()) {
         std::cerr << "Index outside of array size" << std::endl;
         return;
     }
 
     playlist.erase(playlist.begin() + index);
-    conf->removeImage(index, PLAYLIST);
+    conf->removeWallpaper(index, PLAYLIST);
 }
 
-void scheduler::start(){
-    if(isSchedulerRun){
+void scheduler::start() {
+    if (isSchedulerRun) {
         std::cout << "Scheduler already run." << std::endl;
         return;
     }
 
     isSchedulerRun = true;
 
-    while(isSchedulerRun == true){
+    while (isSchedulerRun == true) {
         scheduleImage();
         std::this_thread::sleep_for(std::chrono::minutes(interval));
     }
 }
 
-int scheduler::playlistSize(){
-    return playlist.size();
-}
+int scheduler::playlistSize() { return playlist.size(); }
 
-void scheduler::scheduleImage(){
-    image imageToSet;
+void scheduler::scheduleImage() {
+    wallpaper imageToSet;
 
-    if (randomImage == true){
-        checkIsCurrentImageNotEqualRandomImage:
-        imageToSet = utils::getRandomItem(im->getImages());
-        if(currentImage.fullPath == imageToSet.fullPath)
+    if (randomImage == true) {
+    checkIsCurrentImageNotEqualRandomImage:
+        imageToSet = utils::getRandomItem(wm->getImages());
+        if (currentImage.fullPath == imageToSet.fullPath)
             goto checkIsCurrentImageNotEqualRandomImage;
     } else {
-        if(playlist.empty()){
+        if (playlist.empty()) {
             std::cout << "Playlist is empty." << std::endl;
             return;
         }
-        if(currentImageIndex == playlist.size())
+        if (currentImageIndex == playlist.size())
             currentImageIndex = 0;
 
         imageToSet = playlist[currentImageIndex];
         currentImageIndex++;
     }
-    
+
     auto monitors = conf->getMonitors();
     wallpaperChanger::setWallpaper(monitors, &imageToSet);
     currentImage = imageToSet;
 }
 
-void scheduler::stop(){
-    isSchedulerRun = false;
-}
+void scheduler::stop() { isSchedulerRun = false; }
 
-bool scheduler::isRandomImage(){
-    return randomImage;
-}
+bool scheduler::isRandomImage() { return randomImage; }
 
-void scheduler::setRandomImage(){
+void scheduler::setRandomImage() {
     randomImage == true ? randomImage = false : randomImage = true;
     conf->setImageSchedulerType(randomImage);
 }
 
-void scheduler::changeInterval(std::string interval){
+void scheduler::changeInterval(std::string interval) {
     int intervalInMinutes = utils::getImageIntervalTimeInMinutes(interval);
-    intervalInMinutes == -1 ? this->interval = 0 : this->interval = intervalInMinutes;
+    intervalInMinutes == -1 ? this->interval = 0
+                            : this->interval = intervalInMinutes;
 
     auto jsonSchedler = this->toJson();
     conf->updateScheduler(jsonSchedler);
     conf->saveConfig();
 }
 
-std::vector<image> scheduler::getPlaylist(){
-    return playlist;
-}
+std::vector<wallpaper> scheduler::getPlaylist() { return playlist; }

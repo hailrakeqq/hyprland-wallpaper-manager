@@ -160,8 +160,17 @@ void gui::refresh() {
 
 int8_t gui::on_app_activate() {
     auto refBuilder = Gtk::Builder::create();
+    // auto refBuilderDialog = Gtk::Builder::create();
     try {
-        refBuilder->add_from_file("../gui.ui");
+#if defined(DEBUG_BUILD)
+        refBuilder->add_from_file("../ui/gui.ui");
+        // refBuilderDialog->add_from_file("../ui/popupwindow.ui");
+#else
+        refBuilder->add_from_file("/usr/share/hyprland-wallaper-manager/ui/gui.ui");
+        // refBuilderDialog->add_from_file("/usr/share/hyprland-wallaper-manager/ui/popupwindow.ui");
+
+#endif
+
     } catch (const Glib::FileError& ex) {
         std::cerr << "FileError: " << ex.what() << std::endl;
         return -1;
@@ -175,11 +184,16 @@ int8_t gui::on_app_activate() {
 
     mainwindow = refBuilder->get_widget<Gtk::Window>("main_window");
     wallpapersMatrix = refBuilder->get_widget<Gtk::Grid>("images_matrix");
+    // monitorSetDialog = refBuilderDialog->get_widget<Gtk::Dialog>("dialog");
 
     if (!mainwindow) {
         std::cerr << "Could not get the main window" << std::endl;
         return -1;
     }
+    // if (!monitorSetDialog) {
+    //     std::cerr << "Could not get the dialog window" << std::endl;
+    //     return -1;
+    // }
     if (!wallpapersMatrix) {
         std::cerr << "Widget 'images_matrix' not found in gui.ui" << std::endl;
         return -1;
@@ -190,6 +204,11 @@ int8_t gui::on_app_activate() {
     auto pRandomBtn = refBuilder->get_widget<Gtk::Button>("random_btn");
     auto pAddWallpaperBtn = refBuilder->get_widget<Gtk::Button>("add_wallpaper_btn");
     auto pAddWallpaperDirectoryBtn = refBuilder->get_widget<Gtk::Button>("add_wallpaper_directory_btn");
+
+    // TODO: дописати діалогове вікно
+    // auto dialogCancelBtn = refBuilderDialog->get_widget<Gtk::Button>("cancel_btn");
+    // auto dialogSaveBtn = refBuilderDialog->get_widget<Gtk::Button>("save_monitor_btn");
+    // auto dialogEntryString = refBuilderDialog->get_widget<Gtk::Entry>("inputMonitor");
 
     if (pExitBtn)
         pExitBtn->signal_clicked().connect([this]() { delete mainwindow; });

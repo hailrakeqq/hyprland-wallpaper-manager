@@ -36,6 +36,7 @@ protected:
 private:
     Gtk::Grid* wallpapersMatrix;
     Gtk::Window* mainwindow;
+    Gtk::Dialog* monitorSetDialog;
     configurator* conf;
     wallpaperManager* wm;
     scheduler* s;

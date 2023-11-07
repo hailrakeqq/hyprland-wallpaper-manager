@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
-project(hyprland-wallpaper-scheduler)
+project(hyprland-wallpaper-manager)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -34,17 +34,20 @@ set(CORE_SRC
 )
 
 if(COMPILE_GUI)
+    set(UI_FILES_DIR ${CMAKE_CURRENT_SOURCE_DIR}/ui)
+
     set(GUI
         src/gui/gui.cpp
     )
     add_definitions(-DCOMPILE_GUI)
-    add_executable(hyprland-wallpaper-scheduler ${SRC} ${CORE_SRC} ${GUI})
-    target_link_libraries(hyprland-wallpaper-scheduler PRIVATE ${GTKMM_LIBRARIES} )
+    file(COPY ${UI_FILES_DIR} DESTINATION ${CMAKE_BINARY_DIR}/)
+    add_executable(hyprland-wallpaper-manager ${SRC} ${CORE_SRC} ${GUI})
+    target_link_libraries(hyprland-wallpaper-manager PRIVATE ${GTKMM_LIBRARIES} )
 else()
     set(TUI
         src/tui/tui.cpp
     )
-    add_executable(hyprland-wallpaper-scheduler ${SRC} ${CORE_SRC} ${TUI})
+    add_executable(hyprland-wallpaper-manager ${SRC} ${CORE_SRC} ${TUI})
 endif()
 
-target_link_libraries(hyprland-wallpaper-scheduler PRIVATE nlohmann_json::nlohmann_json)
+target_link_libraries(hyprland-wallpaper-manager PRIVATE nlohmann_json::nlohmann_json)

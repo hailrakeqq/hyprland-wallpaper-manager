@@ -2,7 +2,6 @@
 #include "../include/gui.h"
 #include "../include/scheduler.h"
 #include "../include/tui.h"
-#include <iostream>
 
 int main(int argc, char** argv) {
     auto config = new configurator("config.json");

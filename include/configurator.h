@@ -21,6 +21,7 @@ public:
     configurator(std::string configFilePath);
     std::vector<wallpaper> getWallpapersFromConfig();
     void addWallpaper(wallpaper* img, imageType type);
+    void addWallpapers(std::vector<wallpaper> wallpapers, imageType type);
     void removeWallpaper(wallpaper* img, imageType type);
     void removeWallpaper(uint index, imageType type);
     void setImageSchedulerType(bool type);

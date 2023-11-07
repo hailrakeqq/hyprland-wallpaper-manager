@@ -72,6 +72,21 @@ void configurator::addWallpaper(wallpaper* img, imageType type) {
     saveConfig();
 }
 
+void configurator::addWallpapers(std::vector<wallpaper> wallpapers, imageType type) {
+    for (auto wallpaper : wallpapers) {
+        if (isImageExistInConfig(&wallpaper))
+            continue;
+
+        json imageJson = createJsonWallpaper(&wallpaper);
+        if (type == WALLPAPER_MANAGER)
+            config["images"].push_back(imageJson);
+        else
+            config["scheduler"]["playlist"].push_back(imageJson);
+    }
+
+    saveConfig();
+}
+
 void configurator::removeWallpaper(wallpaper* img, imageType type) {
     if (isImageExistInConfig(img)) {
         return;
@@ -111,7 +126,7 @@ std::string configurator::getMonitors() {
 }
 
 bool configurator::isImageExistInConfig(wallpaper* img) {
-    std::ifstream file("config.json");
+    std::ifstream file(configPath);
     json jsonData;
 
     if (file.is_open()) {

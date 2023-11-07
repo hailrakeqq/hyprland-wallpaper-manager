@@ -57,8 +57,6 @@ void gui::setRandom() {
 }
 
 void gui::wallpaperLoader() {
-    wm->clearWallpapers();
-    wm->addWallpapers(conf->getWallpapersFromConfig());
     for (auto img : wm->getImages())
         insertWallpaper(&img);
 }
@@ -110,8 +108,8 @@ void gui::on_folder_dialog_response(int response_id, Gtk::FileChooserDialog* dia
         case Gtk::ResponseType::OK: {
             auto directoryName = dialog->get_file()->get_path();
             wm->addWallpapers(directoryName);
-            for (auto wallpaper : wm->getWallpapers())
-                conf->addWallpaper(&wallpaper, WALLPAPER_MANAGER);
+            auto wallpapers = wm->getWallpapers();
+            conf->addWallpapers(wallpapers, WALLPAPER_MANAGER);
             break;
         }
         case Gtk::ResponseType::CANCEL: {
@@ -155,6 +153,8 @@ void gui::clearMatrix() {
 
 void gui::refresh() {
     clearMatrix();
+    wm->clearWallpapers();
+    wm->addWallpapers(conf->getWallpapersFromConfig());
     wallpaperLoader();
 }
 
@@ -166,8 +166,8 @@ int8_t gui::on_app_activate() {
         refBuilder->add_from_file("../ui/gui.ui");
         // refBuilderDialog->add_from_file("../ui/popupwindow.ui");
 #else
-        refBuilder->add_from_file("/usr/share/hyprland-wallaper-manager/ui/gui.ui");
-        // refBuilderDialog->add_from_file("/usr/share/hyprland-wallaper-manager/ui/popupwindow.ui");
+        refBuilder->add_from_file("/usr/share/hyprland-wallpaper-manager/ui/gui.ui");
+        // refBuilderDialog->add_from_file("/usr/share/hyprland-wallpaper-manager/ui/popupwindow.ui");
 
 #endif
 

@@ -14,7 +14,7 @@ wallpaperManager::wallpaperManager(std::string wallpapersDirectoryPath) {
 wallpaperManager::wallpaperManager(configurator* conf) {
     this->conf = conf;
     monitors = conf->getMonitors();
-    wallpapers = conf->getWallpapersFromConfig();
+    addWallpapers(conf->getWallpapersFromConfig());
     wallpaperCount = wallpapers.size();
 }
 
@@ -138,9 +138,6 @@ void wallpaperManager::deleteWallpaper(int index) {
 }
 
 void wallpaperManager::clearWallpapers() {
-    for (auto wallpaper : wallpapers)
-        conf->removeWallpaper(&wallpaper, WALLPAPER_MANAGER);
-
     wallpapers.clear();
     wallpaperCount = wallpapers.size();
 }

@@ -17,6 +17,7 @@ sudo chmod +x /usr/local/bin/hyprland-wallpaper-manager
 
 sudo mkdir /usr/share/hyprland-wallpaper-manager/
 sudo cp -r ui /usr/share/hyprland-wallpaper-manager/ 
+mkdir ~/.config/hyprland-wallpaper-manager/
 
 echo "[Desktop Entry]
 Name=Hyprland Wallpaper Manager

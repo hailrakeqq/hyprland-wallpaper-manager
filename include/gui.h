@@ -3,6 +3,7 @@
 
 #include "configurator.h"
 #include "scheduler.h"
+#include "settings_ui.h"
 #include "wallpaperChanger.h"
 #include "wallpaperManager.h"
 #include <gtkmm.h>
@@ -16,15 +17,14 @@ struct itemPosition {
 
 class gui {
 public:
-    gui(configurator* conf, wallpaperManager* wm, scheduler* s);
+    gui(configurator* conf, wallpaperManager* wm, scheduler* s, settings_ui* settingsWindow);
     Glib::RefPtr<Gtk::Application> app;
     int8_t on_app_activate();
     void run(int argc, char** argv);
 
 protected:
     void on_file_dialog_response(int response_id, Gtk::FileChooserDialog* dialog);
-    void on_folder_dialog_response(int response_id,
-        Gtk::FileChooserDialog* dialog);
+    void on_folder_dialog_response(int response_id, Gtk::FileChooserDialog* dialog);
     void addWallpaper(Gtk::Window& mainWindow);
     void addWallpaperDirectory(Gtk::Window& mainWindow);
     void refresh();
@@ -36,7 +36,7 @@ protected:
 private:
     Gtk::Grid* wallpapersMatrix;
     Gtk::Window* mainwindow;
-    Gtk::Dialog* monitorSetDialog;
+    settings_ui* settingsWindow;
     configurator* conf;
     wallpaperManager* wm;
     scheduler* s;

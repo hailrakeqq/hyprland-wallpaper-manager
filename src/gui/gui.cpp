@@ -111,6 +111,7 @@ void gui::on_folder_dialog_response(int response_id, Gtk::FileChooserDialog* dia
             wm->addWallpapers(directoryName);
             auto wallpapers = wm->getWallpapers();
             conf->addWallpapers(wallpapers, WALLPAPER_MANAGER);
+            refresh();
             break;
         }
         case Gtk::ResponseType::CANCEL: {
@@ -132,6 +133,7 @@ void gui::on_file_dialog_response(int response_id, Gtk::FileChooserDialog* dialo
             auto wallpaper = wm->getWallpaper(filename);
             wm->addWallpaper(wallpaper);
             conf->addWallpaper(wallpaper, WALLPAPER_MANAGER);
+            refresh();
             break;
         }
         case Gtk::ResponseType::CANCEL: {
@@ -162,12 +164,12 @@ void gui::refresh() {
 int8_t gui::on_app_activate() {
     auto refBuilder = Gtk::Builder::create();
     try {
-#define DEBUG
-#if defined(DEBUG)
-        refBuilder->add_from_file("../ui/gui.ui");
+#ifdef DEBUG
+        const std::string uiFilePath = "../ui/gui.ui";
 #else
-        refBuilder->add_from_file("/usr/share/hyprland-wallpaper-manager/ui/gui.ui");
+        const std::string uiFilePath = "/usr/share/hyprland-wallpaper-manager/ui/gui.ui";
 #endif
+        refBuilder->add_from_file(uiFilePath);
 
     } catch (const Glib::FileError& ex) {
         std::cerr << "FileError: " << ex.what() << std::endl;

@@ -4,7 +4,7 @@ rm -rf build
 mkdir -p build
 git clone https://github.com/nlohmann/json/
 cd build 
-cmake -DCMAKE_BUILD_TYPE=Release -DDEBUG_BUILD=OFF ..
+cmake -DCMAKE_BUILD_TYPE=Release -DDEBUG=OFF ..
 make
 
 if [ $? -ne 0 ]; then

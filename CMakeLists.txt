@@ -34,6 +34,9 @@ if(DEBUG)
     # Set Debug - for debug
     # Set Release - for release
     set(CMAKE_BUILD_TYPE Debug)
+    add_compile_definitions(DEBUG)
+else()
+    set(CMAKE_BUILD_TYPE Release)
 endif()
 
 if(COMPILE_GUI)

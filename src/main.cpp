@@ -6,7 +6,7 @@
 
 int main(int argc, char** argv) {
 
-#ifdef DEBUG_BUILD
+#ifdef DEBUG
     auto config = new configurator("config.json");
 #else
     std::string home = getenv("HOME");

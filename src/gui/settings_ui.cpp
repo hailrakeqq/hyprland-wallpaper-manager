@@ -6,12 +6,12 @@ void settings_ui::initSettingsWindow(std::string& monitors) {
     auto refBuilderDialog = Gtk::Builder::create();
 
     try {
-#define DEBUG
 #ifdef DEBUG
-        refBuilderDialog->add_from_file("../ui/settings.ui");
+        const std::string uiFilePath = "../ui/settings.ui";
 #else
-        refBuilderDialog->add_from_file("/usr/share/hyprland-wallpaper-manager/ui/settings.ui");
+        const std::string uiFilePath = "/usr/share/hyprland-wallpaper-manager/ui/settings.ui";
 #endif
+        refBuilderDialog->add_from_file(uiFilePath);
     } catch (const Glib::FileError& ex) {
         std::cerr << "FileError: " << ex.what() << std::endl;
         return;

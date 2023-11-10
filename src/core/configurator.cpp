@@ -9,23 +9,15 @@ configurator::configurator(std::string configFilePath) {
         return;
     }
 
-    std::cout << "Enter monitor(s) on which you want set wallpaper(example "
-                 "\"DP-1, DP-2\"): ";
-    std::string monitorInput;
-    std::getline(std::cin, monitorInput);
-
+    std::string monitorInput = utils::getPrimaryMonitorName();
     if (!monitorInput.empty())
         config["monitors"] = monitorInput;
-    else
-        std::cout << "Input is empty. Please provide a valid input." << std::endl;
+    else {
+        config["monitors"] = "";
+    }
 
     config["images"] = json::array();
     config["scheduler"] = json::object();
-    saveConfig();
-}
-
-void configurator::updateMonitors(std::string monitors) {
-    config["monitors"] = monitors;
     saveConfig();
 }
 
@@ -46,6 +38,11 @@ std::vector<wallpaper> configurator::getWallpapersFromConfig() {
 
 void configurator::updateScheduler(json& scheduler) {
     config["scheduler"] = scheduler;
+    saveConfig();
+}
+
+void configurator::updateMonitors(std::string monitors) {
+    config["monitors"] = monitors;
     saveConfig();
 }
 

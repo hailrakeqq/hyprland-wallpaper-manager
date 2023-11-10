@@ -5,5 +5,5 @@ config.json
 
 gui.glade~
 gui.glade
-popupwindow.glade
-popupwindow.glade~
+settings.glade
+settings.glade~

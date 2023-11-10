@@ -74,6 +74,13 @@
               </object>
             </child>
             <child>
+              <object class="GtkButton" id="settings_btn">
+                <property name="label" translatable="1">settings</property>
+                <property name="focusable">1</property>
+                <property name="receives-default">1</property>
+              </object>
+            </child>
+            <child>
               <object class="GtkButton" id="exit_btn">
                 <property name="label" translatable="1">Exit</property>
                 <property name="focusable">1</property>

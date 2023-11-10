@@ -2,10 +2,11 @@
 
 // TODO: add sorting
 
-gui::gui(configurator* conf, wallpaperManager* wm, scheduler* s) {
+gui::gui(configurator* conf, wallpaperManager* wm, scheduler* s, settings_ui* settingsWindow) {
     this->conf = conf;
     this->wm = wm;
     this->s = s;
+    this->settingsWindow = settingsWindow;
 }
 
 void gui::onWallpaperClick(Glib::ustring filename, int n_press, double x, double y) {
@@ -110,6 +111,7 @@ void gui::on_folder_dialog_response(int response_id, Gtk::FileChooserDialog* dia
             wm->addWallpapers(directoryName);
             auto wallpapers = wm->getWallpapers();
             conf->addWallpapers(wallpapers, WALLPAPER_MANAGER);
+            refresh();
             break;
         }
         case Gtk::ResponseType::CANCEL: {
@@ -131,6 +133,7 @@ void gui::on_file_dialog_response(int response_id, Gtk::FileChooserDialog* dialo
             auto wallpaper = wm->getWallpaper(filename);
             wm->addWallpaper(wallpaper);
             conf->addWallpaper(wallpaper, WALLPAPER_MANAGER);
+            refresh();
             break;
         }
         case Gtk::ResponseType::CANCEL: {
@@ -160,16 +163,13 @@ void gui::refresh() {
 
 int8_t gui::on_app_activate() {
     auto refBuilder = Gtk::Builder::create();
-    // auto refBuilderDialog = Gtk::Builder::create();
     try {
-#if defined(DEBUG_BUILD)
-        refBuilder->add_from_file("../ui/gui.ui");
-        // refBuilderDialog->add_from_file("../ui/popupwindow.ui");
+#ifdef DEBUG
+        const std::string uiFilePath = "../ui/gui.ui";
 #else
-        refBuilder->add_from_file("/usr/share/hyprland-wallpaper-manager/ui/gui.ui");
-        // refBuilderDialog->add_from_file("/usr/share/hyprland-wallpaper-manager/ui/popupwindow.ui");
-
+        const std::string uiFilePath = "/usr/share/hyprland-wallpaper-manager/ui/gui.ui";
 #endif
+        refBuilder->add_from_file(uiFilePath);
 
     } catch (const Glib::FileError& ex) {
         std::cerr << "FileError: " << ex.what() << std::endl;
@@ -184,16 +184,11 @@ int8_t gui::on_app_activate() {
 
     mainwindow = refBuilder->get_widget<Gtk::Window>("main_window");
     wallpapersMatrix = refBuilder->get_widget<Gtk::Grid>("images_matrix");
-    // monitorSetDialog = refBuilderDialog->get_widget<Gtk::Dialog>("dialog");
 
     if (!mainwindow) {
         std::cerr << "Could not get the main window" << std::endl;
         return -1;
     }
-    // if (!monitorSetDialog) {
-    //     std::cerr << "Could not get the dialog window" << std::endl;
-    //     return -1;
-    // }
     if (!wallpapersMatrix) {
         std::cerr << "Widget 'images_matrix' not found in gui.ui" << std::endl;
         return -1;
@@ -205,10 +200,15 @@ int8_t gui::on_app_activate() {
     auto pAddWallpaperBtn = refBuilder->get_widget<Gtk::Button>("add_wallpaper_btn");
     auto pAddWallpaperDirectoryBtn = refBuilder->get_widget<Gtk::Button>("add_wallpaper_directory_btn");
 
-    // TODO: дописати діалогове вікно
-    // auto dialogCancelBtn = refBuilderDialog->get_widget<Gtk::Button>("cancel_btn");
-    // auto dialogSaveBtn = refBuilderDialog->get_widget<Gtk::Button>("save_monitor_btn");
-    // auto dialogEntryString = refBuilderDialog->get_widget<Gtk::Entry>("inputMonitor");
+    auto pSettingsBtn = refBuilder->get_widget<Gtk::Button>("settings_btn");
+
+    if (pSettingsBtn)
+        pSettingsBtn->signal_clicked().connect([this]() {
+            enterMonitorGuiSettings:
+                settingsWindow->setConfigurator(conf);
+                std::string defaultValue = "default value";
+                settingsWindow->initSettingsWindow(defaultValue);
+        });
 
     if (pExitBtn)
         pExitBtn->signal_clicked().connect([this]() { delete mainwindow; });

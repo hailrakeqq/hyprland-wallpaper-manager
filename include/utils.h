@@ -2,17 +2,21 @@
 #define UTILS_H
 
 #include "../include/wallpaper.h"
+#include <chrono>
 #include <cstring>
+#include <ctime>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <random>
 #include <sstream>
 #include <stdexcept>
+#include <time.h>
 #include <vector>
 
 namespace utils {
     std::string getFileName(std::string filePath);
+    time_t getLastModifiedTime(std::string filePath);
     std::string getPrimaryMonitorName();
     int getImageIntervalTimeInMinutes(std::string interval);
     long getFileSize(std::string filePath);

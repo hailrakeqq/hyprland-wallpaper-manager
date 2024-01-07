@@ -29,6 +29,7 @@ std::vector<wallpaper> configurator::getWallpapersFromConfig() {
         img.fullPath = jsonImage["fullPath"];
         img.name = jsonImage["name"];
         img.size = jsonImage["size"];
+        img.size = jsonImage["lastModifiedTime"];
 
         images.push_back(img);
     }
@@ -51,6 +52,8 @@ json configurator::createJsonWallpaper(wallpaper* img) {
     imageJson["name"] = img->name;
     imageJson["fullPath"] = img->fullPath;
     imageJson["size"] = img->size;
+    imageJson["lastModifiedTime"] = img->lastModifiedTimet;
+
     return imageJson;
 }
 

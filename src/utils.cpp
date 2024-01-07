@@ -36,6 +36,14 @@ namespace utils {
         return result;
     }
 
+    time_t getLastModifiedTime(std::string filePath) {
+        using namespace std::chrono;
+        std::filesystem::file_time_type ftime = std::filesystem::last_write_time(filePath);
+        auto sctp = time_point_cast<system_clock::duration>(ftime - std::filesystem::file_time_type::clock::now()
+            + system_clock::now());
+        return system_clock::to_time_t(sctp);
+    }
+
     int getImageIntervalTimeInMinutes(std::string interval) {
         int hours, minutes;
         size_t dotPos = interval.find('.');

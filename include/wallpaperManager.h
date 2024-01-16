@@ -21,6 +21,7 @@ public:
     std::vector<wallpaper> getImages();
     bool isWallpaperExist(std::string wallpaperPath);
     wallpaper* getWallpaper(std::string wallpaperPath);
+    void updateWallpapers(std::vector<wallpaper>& wallpapers);
     void addWallpaper(wallpaper* img);
     void addWallpapers(std::string wallpapersDirectoryPath);
     void addWallpapers(std::vector<wallpaper> wallpapers);

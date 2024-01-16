@@ -1,7 +1,5 @@
 #include "../../include/gui.h"
 
-// TODO: add sorting
-
 gui::gui(configurator* conf, wallpaperManager* wm, scheduler* s, settings_ui* settingsWindow) {
     this->conf = conf;
     this->wm = wm;
@@ -147,6 +145,42 @@ void gui::on_file_dialog_response(int response_id, Gtk::FileChooserDialog* dialo
     delete dialog;
 }
 
+void gui::onSortChanged() {
+    auto selectedItemId = comboText->get_active_id();
+    if (!selectedItemId.empty()) {
+        auto wallpapers = wm->getWallpapers();
+
+        if (selectedItemId == "name_up") {
+            std::sort(wallpapers.begin(), wallpapers.end(), [](const wallpaper& a, const wallpaper& b) {
+                return a.name < b.name;
+            });
+        } else if (selectedItemId == "name_down") {
+            std::sort(wallpapers.begin(), wallpapers.end(), [](const wallpaper& a, const wallpaper& b) {
+                return a.name > b.name;
+            });
+        } else if (selectedItemId == "size_up") {
+            std::sort(wallpapers.begin(), wallpapers.end(), [](const wallpaper& a, const wallpaper& b) {
+                return a.size < b.size;
+            });
+        } else if (selectedItemId == "size_down") {
+            std::sort(wallpapers.begin(), wallpapers.end(), [](const wallpaper& a, const wallpaper& b) {
+                return a.size > b.size;
+            });
+        } else if (selectedItemId == "date_up") {
+            std::sort(wallpapers.begin(), wallpapers.end(), [](const wallpaper& a, const wallpaper& b) {
+                return a.lastModifiedTimet < b.lastModifiedTimet;
+            });
+        } else if (selectedItemId == "date_down") {
+            std::sort(wallpapers.begin(), wallpapers.end(), [](const wallpaper& a, const wallpaper& b) {
+                return a.lastModifiedTimet > b.lastModifiedTimet;
+            });
+        }
+
+        wm->updateWallpapers(wallpapers);
+        this->refresh();
+    }
+}
+
 void gui::clearMatrix() {
     int itemsInMatrix = (lastItemPosition.column + 1) + (lastItemPosition.row * 4);
 
@@ -156,8 +190,6 @@ void gui::clearMatrix() {
 
 void gui::refresh() {
     clearMatrix();
-    wm->clearWallpapers();
-    wm->addWallpapers(conf->getWallpapersFromConfig());
     wallpaperLoader();
 }
 
@@ -199,6 +231,7 @@ int8_t gui::on_app_activate() {
     auto pRandomBtn = refBuilder->get_widget<Gtk::Button>("random_btn");
     auto pAddWallpaperBtn = refBuilder->get_widget<Gtk::Button>("add_wallpaper_btn");
     auto pAddWallpaperDirectoryBtn = refBuilder->get_widget<Gtk::Button>("add_wallpaper_directory_btn");
+    comboText = refBuilder->get_widget<Gtk::ComboBoxText>("sort_menu");
 
     auto pSettingsBtn = refBuilder->get_widget<Gtk::Button>("settings_btn");
 
@@ -220,6 +253,8 @@ int8_t gui::on_app_activate() {
         pAddWallpaperBtn->signal_clicked().connect([this]() { this->addWallpaper(*mainwindow); });
     if (pAddWallpaperDirectoryBtn)
         pAddWallpaperDirectoryBtn->signal_clicked().connect([this]() { this->addWallpaperDirectory(*mainwindow); });
+
+    comboText->signal_changed().connect([this]() { this->onSortChanged(); });
 
     wallpaperLoader();
     app->add_window(*mainwindow);

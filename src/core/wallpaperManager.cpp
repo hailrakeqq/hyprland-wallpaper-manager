@@ -140,6 +140,10 @@ void wallpaperManager::deleteWallpaper(int index) {
     }
 }
 
+void wallpaperManager::updateWallpapers(std::vector<wallpaper>& wallpapers) {
+    this->wallpapers = wallpapers;
+}
+
 void wallpaperManager::clearWallpapers() {
     wallpapers.clear();
     wallpaperCount = wallpapers.size();

@@ -6,6 +6,15 @@ namespace utils {
         return path.filename().string();
     }
 
+    std::vector<wallpaper>::iterator getItemIndexInVector(std::vector<wallpaper>& vec,
+        wallpaper* img) {
+        for (auto i = vec.begin(); i != vec.end(); ++i) {
+            if (i->fullPath == img->fullPath)
+                return i;
+        }
+        return vec.end();
+    }
+
     std::string getPrimaryMonitorName() {
         char buffer[128];
         std::string result = "";
@@ -84,12 +93,19 @@ namespace utils {
         return arr[randomIndex];
     }
 
-    std::vector<wallpaper>::iterator getItemIndexInVector(std::vector<wallpaper>& vec,
-        wallpaper* img) {
-        for (auto i = vec.begin(); i != vec.end(); ++i) {
-            if (i->fullPath == img->fullPath)
-                return i;
-        }
-        return vec.end();
+    template <typename T>
+    bool compareAscending(T a, T b) {
+        return a < b;
+    }
+
+    template <typename T>
+    bool compareDescending(T a, T b) {
+        return a > b;
+    }
+
+    void sortByPropertyAscending(std::vector<wallpaper> wallpapers) {
+    }
+
+    void sortByPropertyDescending(std::vector<wallpaper> wallpapers) {
     }
 } // namespace utils

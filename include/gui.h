@@ -4,6 +4,7 @@
 #include "configurator.h"
 #include "scheduler.h"
 #include "settings_ui.h"
+#include "utils.h"
 #include "wallpaperChanger.h"
 #include "wallpaperManager.h"
 #include <gtkmm.h>
@@ -27,6 +28,7 @@ protected:
     void on_folder_dialog_response(int response_id, Gtk::FileChooserDialog* dialog);
     void addWallpaper(Gtk::Window& mainWindow);
     void addWallpaperDirectory(Gtk::Window& mainWindow);
+    void onSortChanged();
     void refresh();
     void setRandom();
 
@@ -35,6 +37,7 @@ protected:
 
 private:
     Gtk::Grid* wallpapersMatrix;
+    Gtk::ComboBoxText* comboText;
     Gtk::Window* mainwindow;
     settings_ui* settingsWindow;
     configurator* conf;

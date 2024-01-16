@@ -57,7 +57,17 @@
               </object>
             </child>
             <child>
-              <object class="GtkComboBox" id="sort_menu"/>
+              <object class="GtkComboBoxText" id="sort_menu">
+                <property name="active">-1</property>
+                <items>
+                  <item id="name_up" translatable="yes">Name ↑</item>
+                  <item id="name_down" translatable="yes">Name ↓</item>
+                  <item id="date_up" translatable="yes">Date ↑</item>
+                  <item id="date_down" translatable="yes">Date ↓</item>
+                  <item id="size_up" translatable="yes">Size ↑</item>
+                  <item id="size_down" translatable="yes">Size ↓</item>
+                </items>
+              </object>
             </child>
             <child>
               <object class="GtkButton" id="random_btn">

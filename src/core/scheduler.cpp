@@ -24,6 +24,7 @@ scheduler::scheduler(configurator* conf, wallpaperManager* wm) {
             img.fullPath = item["fullPath"];
             img.name = item["name"];
             img.size = item["size"];
+            img.lastModifiedTimet = item["lastModifiedTime"];
 
             scheduler::playlist.push_back(img);
         }
@@ -63,6 +64,7 @@ json scheduler::toJson() {
         imageJson["name"] = img.name;
         imageJson["fullPath"] = img.fullPath;
         imageJson["size"] = img.size;
+        imageJson["lastModifiedTime"] = img.lastModifiedTimet;
 
         playlistArray.push_back(imageJson);
     }

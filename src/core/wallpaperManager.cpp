@@ -38,6 +38,7 @@ wallpaper* wallpaperManager::getWallpaper(std::string wallpaperPath) {
     img->fullPath = wallpaperPath;
     img->name = utils::getFileName(wallpaperPath);
     img->size = utils::getFileSize(wallpaperPath);
+    img->lastModifiedTimet = utils::getLastModifiedTime(wallpaperPath);
 
     return img;
 }
@@ -68,6 +69,8 @@ wallpaperManager::getFilesInDirectory(std::string& directoryPath) {
             img->fullPath = entry.path().string();
             img->name = entry.path().filename();
             img->size = entry.file_size();
+
+            img->lastModifiedTimet = utils::getLastModifiedTime(entry.path().string());
 
             images.push_back(*img);
         }
@@ -135,6 +138,10 @@ void wallpaperManager::deleteWallpaper(int index) {
         conf->removeWallpaper(index, WALLPAPER_MANAGER);
         wallpaperCount--;
     }
+}
+
+void wallpaperManager::updateWallpapers(std::vector<wallpaper>& wallpapers) {
+    this->wallpapers = wallpapers;
 }
 
 void wallpaperManager::clearWallpapers() {
